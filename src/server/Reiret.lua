@@ -17,7 +17,9 @@ local egg = {}       -- [id] = { id, sj, art, start, modell }
 local nesteId = 0
 local mappe
 local rng = Random.new()
-Reiret.flaks = 1     -- > 1 under hendelser (Server Luck)
+Reiret.grunnFlaks = 1 -- 2 når noen har kjøpt Server Luck
+Reiret.flaks = 1      -- grunnFlaks, eller mer under Cosmic Night
+Reiret.kosmisk = nil  -- sjanse for Secret-egg (bare under Cosmic Night)
 
 local function naa()
 	return workspace:GetServerTimeNow()
@@ -43,6 +45,9 @@ end
 
 -- Legg et nytt egg på båndet. sj/art kan bestemmes (hendelser), ellers trekkes de.
 function Reiret.nyttEgg(sj, art)
+	if not sj and Reiret.kosmisk and rng:NextNumber() < Reiret.kosmisk and #Fugler.tilgjengelige("Secret", tillat) > 0 then
+		sj = "Secret"
+	end
 	sj = sj or Fugler.trekkSjeldenhet(rng, Reiret.flaks, tillat)
 	art = art or Fugler.trekkArt(rng, sj, tillat)
 	if not art then
@@ -104,6 +109,7 @@ function Reiret.kjop(spiller, id)
 	if p then
 		p.data.kjopt = (p.data.kjopt or 0) + 1
 	end
+	Spillere.maal(spiller, "kjop")
 	Fjern.Hendelse:FireAllClients("kjopt", spiller, e.sj, pos)
 end
 

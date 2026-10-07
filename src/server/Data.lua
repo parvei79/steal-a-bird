@@ -26,6 +26,10 @@ function Data.standard()
 		index = {},           -- { [art] = { Normal = true, Gold = true, ... } }
 		tyverier = 0,
 		kjopt = 0,
+		rebirths = 0,
+		veiledning = 1,       -- hvilket mål nye spillere er på (1–4, 5 = ferdig)
+		besteInntekt = 0,     -- høyeste inntekt/s noensinne (topplisten)
+		kvitteringer = {},    -- de siste Robux-kjøpene som er gitt (så ingenting gis to ganger)
 	}
 end
 

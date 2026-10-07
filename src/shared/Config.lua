@@ -45,7 +45,7 @@ Config.BAER = {
 
 Config.BASE = {
 	SOKLER_START = 6,
-	SOKLER_MAKS = 16,
+	SOKLER_MAKS = 20,             -- 16 med oppgraderinger + 4 med Extra Slots-passet
 	LAAS_TID = 40,           -- sekunder låsen varer (Lock Time-oppgraderingen øker den)
 	NYBEGYNNER = 180,        -- sekunder ingen kan stjele fra en ny spiller
 	SAMLE_AVSTAND = 4.5,     -- hvor nær pengeplaten du må stå
@@ -72,6 +72,46 @@ Config.OPPGRADERINGER = {
 		verdier = { 6, 8, 10, 12, 14, 16 }, enhet = " slots", priser = { 500, 5000, 50000, 500000, 5000000 } },
 	{ id = "laas", navn = "Lock Time", tekst = "Your shield lasts longer",
 		verdier = { 40, 50, 60, 70, 80, 90 }, enhet = " s", priser = { 300, 3000, 30000, 300000, 3000000 } },
+}
+
+-- ---------------------------------------------------------------- hendelser
+Config.HENDELSER = {
+	GULLREGN_FORST = 360,    -- sekunder etter serverstart til første Golden Egg Rain
+	GULLREGN_HVERT = 720,    -- og så hvert 12. minutt
+	GULLREGN_VARER = 90,
+	GULLREGN_INTERVALL = 2.5, -- sekunder mellom hvert gullegg som faller
+	GULLEGG_LIGGER = 30,     -- så lenge et gullegg ligger før det forsvinner
+	GULLEGG_FLAKS = 4,       -- flaks når arten til et gullegg trekkes
+	KOSMISK_FORST = 900,     -- Cosmic Night etter 15 minutter
+	KOSMISK_HVERT = 1500,    -- og så hvert 25. minutt
+	KOSMISK_VARER = 180,
+	KOSMISK_SJANSE = 0.04,   -- sjanse for at et nytt egg på båndet er et Secret-egg (Cosmic Shoebill)
+	KOSMISK_FLAKS = 3,
+}
+
+-- ---------------------------------------------------------------- rebirth
+Config.REBIRTH = {
+	PRIS = 25000000,         -- første rebirth koster $25M, så ganges prisen med FAKTOR
+	FAKTOR = 8,
+	BONUS = 0.5,             -- +50 % inntekt for hver rebirth
+	TAU = { "Gold", "Lava", "Ice", "Galaxy" }, -- tau-farger du låser opp (rebirth 1, 2, 3, 4+)
+}
+
+-- ---------------------------------------------------------------- Robux (game passes og produkter)
+-- Lag dem på create.roblox.com → spillet → Monetization (Passes / Developer Products) etter at spillet er
+-- publisert, og lim inn ID-ene her. ID = 0 betyr «ikke laget ennå» (knappen viser «Soon»).
+Config.ROBUX = {
+	PASS = {
+		{ id = "VIP", passId = 0, navn = "VIP", tekst = "x2 cash from all your birds + a golden VIP tag", robux = 199 },
+		{ id = "AutoCollect", passId = 0, navn = "Auto Collect", tekst = "Your cash flies straight to you — no walking to the pad", robux = 99 },
+		{ id = "ExtraSlots", passId = 0, navn = "+4 Base Slots", tekst = "Room for 4 more birds in your base", robux = 149 },
+		{ id = "RainbowRope", passId = 0, navn = "Rainbow Rope", tekst = "Your grappling rope shines in all colors", robux = 49 },
+	},
+	PRODUKT = {
+		{ id = "ServerLuck", produktId = 0, navn = "Server Luck x2", tekst = "15 minutes: rare eggs twice as common for EVERYONE", robux = 49 },
+		{ id = "Cash", produktId = 0, navn = "Cash Pack", tekst = "10 minutes of your income (at least $1K)", robux = 25 },
+	},
+	LUCK_TID = 900,           -- sekunder Server Luck varer
 }
 
 Config.FALL_GRENSE = -30       -- under denne Y er du falt ned i skyene

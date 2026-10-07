@@ -41,13 +41,21 @@ function Baser.skjermet(i)
 	return (skjoldTil[i] or 0) > naa()
 end
 
--- Hvor mange sokler eieren har låst opp.
+-- Hvor mange sokler eieren har låst opp (oppgradering + Extra Slots-passet).
 function Baser.sokler(i)
 	local e = eiere[i]
 	if not e then
 		return 0
 	end
-	return Spillere.verdi(e, "sokler")
+	return math.min(Spillere.verdi(e, "sokler") + (Spillere.harPass(e, "ExtraSlots") and 4 or 0), Config.BASE.SOKLER_MAKS)
+end
+
+-- Pengene på platen forsvinner (rebirth).
+function Baser.tomPott(spiller)
+	local i = baseTil[spiller]
+	if i then
+		pott[i] = 0
+	end
 end
 
 function Baser.pott(i)
@@ -276,19 +284,27 @@ local function dyttUt(i)
 	end
 end
 
-local function samle(i)
+local function samle(i, auto)
 	local e = eiere[i]
 	local rot = e and e.Character and e.Character:FindFirstChild("HumanoidRootPart")
 	if not rot or (pott[i] or 0) < 1 then
 		return
 	end
 	local p = deler[i].plate.Position
+	if auto and Spillere.harPass(e, "AutoCollect") then
+		-- Auto Collect: pengene går rett til eieren, uten myntregn
+		local belop = math.floor(pott[i])
+		pott[i] -= belop
+		Spillere.giPenger(e, belop)
+		return
+	end
 	local flat = Vector3.new(rot.Position.X - p.X, 0, rot.Position.Z - p.Z).Magnitude
 	if flat <= Config.BASE.SAMLE_AVSTAND and math.abs(rot.Position.Y - p.Y) < 7 then
 		local belop = math.floor(pott[i])
 		pott[i] -= belop
 		Spillere.giPenger(e, belop)
 		Fjern.Hendelse:FireAllClients("samlet", e, belop, p)
+		Spillere.maal(e, "samle")
 		if Baser.vedSamling then
 			Baser.vedSamling(e, belop)
 		end
@@ -316,6 +332,7 @@ local function steg(dt)
 		for i = 1, Kart.ANTALL_BASER do
 			local d = deler[i]
 			if eiere[i] then
+				samle(i, true)
 				local laast = Baser.laast(i)
 				d.kuppel.Transparency = laast and 0.55 or 1
 				if laast then

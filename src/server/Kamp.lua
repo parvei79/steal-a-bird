@@ -52,11 +52,16 @@ local function lagPistol()
 	return verktoy
 end
 
+Kamp.vedFigur = nil -- funksjon(spiller) når en ny figur er klar (taufarge, VIP-merke)
+
 local function figurInn(spiller, figur)
 	local hum = figur:WaitForChild("Humanoid")
 	hum.BreakJointsOnDeath = false
 	figur:SetAttribute("Ragdoll", 0)
 	figur:SetAttribute("Svimmel", 0)
+	if Kamp.vedFigur then
+		Kamp.vedFigur(spiller)
+	end
 	task.defer(function()
 		local verktoy = lagPistol()
 		verktoy.Parent = spiller:WaitForChild("Backpack")

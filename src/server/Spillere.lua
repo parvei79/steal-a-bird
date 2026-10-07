@@ -41,6 +41,10 @@ local function oppdaterLederstat(spiller, p)
 		if s then
 			s.Value = p.data.tyverier or 0
 		end
+		local r = ls:FindFirstChild("Rebirths")
+		if r then
+			r.Value = p.data.rebirths or 0
+		end
 	end
 end
 
@@ -69,6 +73,72 @@ function Spillere.betal(spiller, n)
 	oppdaterLederstat(spiller, p)
 	Spillere.sendStatus(spiller)
 	return true
+end
+
+-- ---------------------------------------------------------------- game passes og rebirth
+
+function Spillere.harPass(spiller, id)
+	local p = profiler[spiller]
+	return p ~= nil and p.pass[id] == true
+end
+
+function Spillere.settPass(spiller, id)
+	local p = profiler[spiller]
+	if p then
+		p.pass[id] = true
+		Spillere.oppdaterFigur(spiller)
+		Spillere.sendStatus(spiller)
+	end
+end
+
+function Spillere.rebirths(spiller)
+	local p = profiler[spiller]
+	return p and (p.data.rebirths or 0) or 0
+end
+
+function Spillere.rebirthPris(spiller)
+	return Config.REBIRTH.PRIS * Config.REBIRTH.FAKTOR ^ Spillere.rebirths(spiller)
+end
+
+-- Inntektsfaktor: +50 % per rebirth, og x2 med VIP.
+function Spillere.faktor(spiller)
+	local f = 1 + Config.REBIRTH.BONUS * Spillere.rebirths(spiller)
+	if Spillere.harPass(spiller, "VIP") then
+		f *= 2
+	end
+	return f
+end
+
+-- Attributter på figuren som alle klientene bruker (taufarge, VIP-merke).
+function Spillere.oppdaterFigur(spiller)
+	local f = spiller.Character
+	if not f then
+		return
+	end
+	local farge = nil
+	local n = Spillere.rebirths(spiller)
+	if n > 0 then
+		farge = Config.REBIRTH.TAU[math.min(n, #Config.REBIRTH.TAU)]
+	end
+	if Spillere.harPass(spiller, "RainbowRope") then
+		farge = "Rainbow"
+	end
+	f:SetAttribute("TauFarge", farge)
+	f:SetAttribute("VIP", Spillere.harPass(spiller, "VIP"))
+	f:SetAttribute("Rebirths", n)
+end
+
+-- ---------------------------------------------------------------- veiledning for nye spillere
+-- Mål 1–4: kjøp et egg, bær det hjem, hent pengene, stjel en fugl. 5 = ferdig.
+Spillere.MAAL = { kjop = 1, hjem = 2, samle = 3, stjel = 4 }
+
+function Spillere.maal(spiller, hva)
+	local p = profiler[spiller]
+	local n = Spillere.MAAL[hva]
+	if p and n and (p.data.veiledning or 1) == n then
+		p.data.veiledning = n + 1
+		Spillere.sendStatus(spiller)
+	end
 end
 
 function Spillere.tyveri(spiller)
@@ -145,6 +215,11 @@ function Spillere.status(spiller)
 		oppgr = Data.kopi(p.data.oppgr),
 		index = Data.kopi(p.data.index),
 		tyverier = p.data.tyverier or 0,
+		rebirths = p.data.rebirths or 0,
+		rebirthPris = Spillere.rebirthPris(spiller),
+		veiledning = p.data.veiledning or 1,
+		faktor = Spillere.faktor(spiller),
+		pass = Data.kopi(p.pass),
 		lagres = p.lagres,
 		advarsel = Data.advarsel,
 	}
@@ -182,7 +257,7 @@ function Spillere.inn(spiller)
 		end
 		return nil
 	end
-	local p = { data = data, lagres = lagres, kom = workspace:GetServerTimeNow(), sistLagret = os.clock() }
+	local p = { data = data, lagres = lagres, kom = workspace:GetServerTimeNow(), sistLagret = os.clock(), pass = {} }
 	profiler[spiller] = p
 	local ls = Instance.new("Folder")
 	ls.Name = "leaderstats"
@@ -192,6 +267,9 @@ function Spillere.inn(spiller)
 	local s = Instance.new("IntValue")
 	s.Name = "Steals"
 	s.Parent = ls
+	local r = Instance.new("IntValue")
+	r.Name = "Rebirths"
+	r.Parent = ls
 	ls.Parent = spiller
 	oppdaterLederstat(spiller, p)
 	return p

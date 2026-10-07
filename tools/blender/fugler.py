@@ -15,9 +15,8 @@ Fargene registreres når modulen importeres (før palett_materiale), så importe
 import math
 
 import rbxlib as R
-from voksel import Voksler, farge_trio
-
-S = 0.3   # kubestørrelse — lik for alle fugler, så stilen blir lik
+from fuglebygg import Fugl, S, OYE, SOT_OYE, bein, fot  # noqa: F401
+from voksel import Voksler, farge_trio, langs
 
 # ------------------------------------------------------------------ farger
 _TRIO = dict(
@@ -48,71 +47,6 @@ _TRIO = dict(
 )
 for _n, _h in _TRIO.items():
     farge_trio(_n, _h)
-R.farger(svart='#16161c', hvit='#ffffff', tann='#fbfbf5', klo='#1d1d22', stjerne='#ffffff', stjernegul='#ffe783',
-         ojegul='#ffe45c', ojeoransje='#ff9a1f', ojerod='#ff4a2a', ojecyan='#8ff8ff')
-
-OYE = {'w': 'hvit', 'k': 'svart'}
-SOT_OYE = ['wk', 'kk']                    # søtt øye: svart 2x2 med hvitt glimt
-
-
-# ------------------------------------------------------------------ byggeklosser
-
-class Fugl:
-    def __init__(self):
-        self.kropp = Voksler(S)
-        self.vinge = Voksler(S)       # HØYRE vinge (+x); venstre lages ved speiling
-        self.ekstra = None
-        self.hengsel = (1.0, 0.0, 2.5)
-        self.punkter = {}
-
-    def ferdig(self, navn):
-        hx, hy, hz = self.hengsel
-        punkter = dict(self.punkter)
-        punkter['hengselH'] = (hx, hy, hz)
-        punkter['hengselV'] = (-hx, hy, hz)
-        R.ny_modell()
-        self.kropp.lag()
-        R.ferdig_modell(navn, punkter=punkter)
-        R.ny_modell()
-        self.vinge.lag()
-        R.ferdig_modell(navn + '_VingeH')
-        R.ny_modell()
-        self.vinge.speilet().lag()
-        R.ferdig_modell(navn + '_VingeV')
-        if self.ekstra is not None:
-            R.ny_modell()
-            self.ekstra.lag()
-            R.ferdig_modell(navn + '_Ekstra')
-
-
-def fot(v, x, y, farge, form='T', klo=None, lengde=3):
-    """Fot på bakken, bygget kube for kube så tærne holder seg adskilt. (x, y) = ankelen.
-    form: 'stump' (én tå forover), 'T' (pluss to korte sidetær), 'gaffel' (store fuglefotspor —
-    trenger minst 6 kubers avstand mellom beina, dvs. x = ±1.05)."""
-    i0, j0, k0 = v._celle((x, y, 0.15))
-
-    def sett(di, dj, f):
-        v.celler[(i0 + di, j0 + dj, k0)] = f
-    for dj in range(-1, lengde):
-        sett(0, dj, farge)
-    tupper = [(0, lengde)]
-    if form == 'T':
-        for s_ in (-1, 1):
-            sett(s_, 1, farge)
-        tupper += [(-1, 2), (1, 2)]
-    elif form == 'gaffel':
-        for s_ in (-1, 1):
-            sett(s_, 1, farge)
-            sett(2 * s_, 2, farge)
-            sett(2 * s_, 3, farge)
-        tupper += [(-2, 4), (2, 4)]
-    if klo:
-        for di, dj in tupper:
-            sett(di, dj, klo)
-
-
-def bein(v, x, hofte, ankel, farge, r=0.2):
-    v.kjegle((x, hofte[0], hofte[1]), (x, ankel[0], ankel[1]), r, r, farge)
 
 
 # ------------------------------------------------------------------ fuglene
@@ -156,7 +90,6 @@ def tukan():
     k.ellipsoide((0, -0.95, 1.0), (0.65, 0.5, 0.4), 'tukanrod', modus='mal')
     # nebbet: høyt og smalt, grønt -> gult -> oransje -> rød spiss
     nebb = ['tukangronn', 'tukangul', 'tukangul', 'tukanoransje', 'tukanoransje', 'tukanrod']
-    from voksel import langs
     k.ellipsoide((0, 2.0, 3.2), (0.46, 1.4, 0.62), langs((0, 0.8, 0), (0, 3.4, 0), nebb), p=2.4)
     k.kjegle((0, 3.05, 3.35), (0, 3.5, 2.85), 0.36, 0.12, 'tukanrod')
     k.boks((-0.6, 0.7, 3.0), (0.6, 3.6, 3.08), 'tukansvart', modus='mal')          # munnlinje
@@ -365,6 +298,16 @@ FUGLER = {
     'Phoenix': fonix,
     'CosmicShoebill': kosmisk_skonebb,
 }
+
+# Fuglegruppene (laget i egne moduler) legges til automatisk hvis de finnes.
+for _modul in ('fugler_vanlige', 'fugler_sjeldne', 'fugler_legender'):
+    try:
+        _m = __import__(_modul)
+    except ModuleNotFoundError as _feil:
+        if _feil.name != _modul:
+            raise
+        continue
+    FUGLER.update(_m.FUGLER)
 
 DELER = ('', '_VingeH', '_VingeV', '_Ekstra')
 

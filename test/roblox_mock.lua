@@ -255,6 +255,7 @@ local HENDELSER = {
 	InputBegan = true, InputEnded = true, InputChanged = true, DescendantRemoving = true,
 	Triggered = true, TriggerEnded = true, PromptShown = true, PromptHidden = true, MouseButton1Click = true,
 	Activated = true, FocusLost = true, PreSimulation = true, PostSimulation = true,
+	PromptGamePassPurchaseFinished = true, PromptProductPurchaseFinished = true,
 }
 
 local function ny(klasse, forelder)

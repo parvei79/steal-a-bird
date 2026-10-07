@@ -330,6 +330,13 @@ function Effekter.egen(liste)
 	end
 end
 
+-- Et gullegg har landet (Golden Egg Rain).
+function Effekter.landetEgg(pos)
+	burst(pos + Vector3.new(0, 1, 0), Color3.fromRGB(255, 215, 60), 20, 18, 0.7, "rbxasset://textures/particles/sparkles_main.dds")
+	sjokkbolge(pos + Vector3.new(0, 0.3, 0), 10, Color3.fromRGB(255, 220, 90))
+	lyd(L.tungLanding, pos, 0.5, 1.3)
+end
+
 -- Superhelt-landing: dunk, støv og sjokkbølge (for alle som ser det).
 function Effekter.landing(pos, styrke, egen)
 	lyd(L.tungLanding, pos, 0.6 + 0.5 * styrke, 0.85 + math.random() * 0.1)
@@ -500,10 +507,70 @@ local function serverHendelse(type_, a, b, c, d, e)
 		HUD.melding(string.format("%s and %s traded birds! 🤝", a.DisplayName, b.DisplayName), Color3.fromRGB(255, 230, 140))
 	elseif type_ == "oppgradert" then
 		lyd2D(L.magi, 0.7, 1.2)
+	elseif type_ == "hendelse" then
+		-- a = navn, b = start (true) / slutt (false)
+		if a == "GoldenRain" then
+			if b then
+				HUD.banner("🥚✨ GOLDEN EGG RAIN! Grab the golden eggs! ✨🥚", Color3.fromRGB(255, 215, 60), 5)
+				lyd2D(L.forvandling, 0.8, 1.1, 3)
+				lyd2D(L.jubel, 0.35, 1, 4)
+			else
+				HUD.melding("The Golden Egg Rain is over", Color3.fromRGB(255, 225, 140))
+			end
+		elseif a == "CosmicNight" then
+			if b then
+				HUD.banner("🌙✨ COSMIC NIGHT! Look for Secret eggs on the conveyor! ✨🌙", Color3.fromRGB(150, 230, 255), 5)
+				lyd2D(L.forvandling, 0.8, 0.7, 3)
+			else
+				HUD.melding("The sun rises. Cosmic Night is over ☀️", Color3.fromRGB(200, 220, 255))
+			end
+		end
+	elseif type_ == "rebirth" then
+		-- a = spiller, b = antall rebirths
+		local rot = a and a.Character and a.Character:FindFirstChild("HumanoidRootPart")
+		if rot then
+			konfetti(rot.Position, 80)
+			lyssoyle(rot.Position - Vector3.new(0, 3, 0), Color3.fromRGB(255, 215, 60), 30)
+			lyd(L.forvandling, rot.Position, 1, 0.8)
+		end
+		if erMeg(a) then
+			HUD.banner(string.format("🌟 REBIRTH %d! Your birds now earn x%.1f! 🌟", b, 1 + Config.REBIRTH.BONUS * b),
+				Color3.fromRGB(255, 215, 60), 5)
+			lyd2D(L.jubel, 0.6, 1, 4)
+		else
+			HUD.melding(string.format("%s did REBIRTH %d! 🌟", a.DisplayName, b), Color3.fromRGB(255, 215, 60))
+		end
+	elseif type_ == "serverLuck" then
+		HUD.banner("🍀 " .. a.DisplayName .. " bought SERVER LUCK! Rare eggs x2 for everyone! 🍀",
+			Color3.fromRGB(120, 255, 140), 4)
+		lyd2D(L.magi, 0.8, 1)
 	end
 end
 
 -- ---------------------------------------------------------------- tyvemerket og fartsstrekene
+
+local vipMerker = {} -- [figur] = BillboardGui
+local function oppdaterVip()
+	for _, p in Players:GetPlayers() do
+		local f = p.Character
+		if f and f:GetAttribute("VIP") and not vipMerker[f] then
+			local hode = f:FindFirstChild("Head")
+			if hode then
+				local gui = UI.ny("BillboardGui", { Name = "VipMerke", Size = UDim2.fromOffset(120, 30),
+					StudsOffset = Vector3.new(0, 3.4, 0), LightInfluence = 0, MaxDistance = 120, Adornee = hode }, hode)
+				UI.tekst({ Size = UDim2.fromScale(1, 1), Text = "👑 VIP", TextColor3 = Color3.fromRGB(255, 215, 60),
+					TextStrokeTransparency = 0 }, gui)
+				vipMerker[f] = gui
+			end
+		end
+	end
+	for f, g in vipMerker do
+		if not f.Parent or not f:GetAttribute("VIP") then
+			g:Destroy()
+			vipMerker[f] = nil
+		end
+	end
+end
 
 local merker = {} -- [figur] = { gui, highlight }
 local function oppdaterTyver()
@@ -600,6 +667,7 @@ function Effekter.start(grappler, kamera, remotes, hud, positurer)
 		if akk > 0.25 then
 			akk = 0
 			oppdaterTyver()
+			oppdaterVip()
 		end
 	end)
 end

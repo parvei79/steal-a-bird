@@ -32,7 +32,7 @@ local function paaBakken(pos, tekst, hoyde)
 end
 
 for i = 1, Kart.ANTALL_BASER do
-	for n = 1, 16 do
+	for n = 1, Kart.ANTALL_SOKLER do
 		local p = Kart.sokkel(i, n).Position
 		-- hele sokkelen (radius 2) må stå på øya
 		for _, d in { Vector3.new(2, 0, 0), Vector3.new(-2, 0, 0), Vector3.new(0, 0, 2), Vector3.new(0, 0, -2) } do

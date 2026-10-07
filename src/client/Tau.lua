@@ -82,6 +82,30 @@ local function munning(figur)
 	return h and h.Position or nil, nil
 end
 
+-- Taufarger: svart som standard, rebirth gir Gold/Lava/Ice/Galaxy, Rainbow Rope-passet gir regnbue.
+local TAUFARGER = {
+	Gold = { ColorSequence.new(Color3.fromRGB(255, 215, 70), Color3.fromRGB(255, 170, 30)), 0.6 },
+	Lava = { ColorSequence.new(Color3.fromRGB(255, 120, 30), Color3.fromRGB(200, 30, 20)), 0.9 },
+	Ice = { ColorSequence.new(Color3.fromRGB(200, 250, 255), Color3.fromRGB(90, 190, 255)), 0.7 },
+	Galaxy = { ColorSequence.new(Color3.fromRGB(150, 90, 255), Color3.fromRGB(255, 110, 220)), 0.9 },
+}
+local SVART = ColorSequence.new(Color3.fromRGB(12, 12, 14))
+
+local function tauFarge(v, figur)
+	local navn = figur and figur:GetAttribute("TauFarge")
+	if navn == "Rainbow" then
+		local t = os.clock() * 0.5
+		v.beam.Color = ColorSequence.new(Color3.fromHSV(t % 1, 0.8, 1), Color3.fromHSV((t + 0.3) % 1, 0.8, 1))
+		v.beam.LightEmission = 0.8
+		v.farge = navn
+	elseif navn ~= v.farge then
+		v.farge = navn
+		local f = TAUFARGER[navn or ""]
+		v.beam.Color = f and f[1] or SVART
+		v.beam.LightEmission = f and f[2] or 0.2
+	end
+end
+
 -- Tegn én krok: tilstand = "inne" | "ute" | "fest" | "tilbake", pos = krokens posisjon.
 local function tegn(v, tilstand, pos, handPos, munningAtt, dt)
 	if tilstand == "inne" or not pos or not handPos then
@@ -172,7 +196,9 @@ local function oppdaterAndre(dt)
 				a.tilstand = "inne"
 			end
 		end
-		tegn(visning(p), a.tilstand, a.pos, hand, att, dt)
+		local v = visning(p)
+		tauFarge(v, p.Character)
+		tegn(v, a.tilstand, a.pos, hand, att, dt)
 	end
 end
 
@@ -196,7 +222,9 @@ function Tau.start(grappler, remotes)
 		local s = Grappler.tilstand()
 		local figur = Grappler.figur()
 		local hand, att = munning(figur)
-		tegn(visning(spiller), s.krok, s.krokPos, hand, att, dt)
+		local v = visning(spiller)
+		tauFarge(v, figur)
+		tegn(v, s.krok, s.krokPos, hand, att, dt)
 		oppdaterAndre(dt)
 	end)
 end

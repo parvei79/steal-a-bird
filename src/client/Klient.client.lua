@@ -31,6 +31,7 @@ Tau.start(Grappler, remotes)
 HUD.start(Grappler, Kamera, remotes)
 Effekter.start(Grappler, Kamera, remotes, HUD, Positurer)
 Positurer.start(Grappler, Tau, remotes)
+Fugleliv.vedLanding = Effekter.landetEgg
 Fugleliv.start()
 Prompter.start(remotes)
 Menyer.start(HUD, Kamera, Grappler, remotes)

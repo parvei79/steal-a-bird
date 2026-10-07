@@ -13,6 +13,11 @@ local Ting = require(script.Parent.Ting)
 local Reiret = require(script.Parent.Reiret)
 local Kamp = require(script.Parent.Kamp)
 local Handel = require(script.Parent.Handel)
+local Hendelser = require(script.Parent.Hendelser)
+local Robux = require(script.Parent.Robux)
+local Ledertavle = require(script.Parent.Ledertavle)
+local Config = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Config"))
+local Fugler = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Fugler"))
 
 -- remotes først, så klientene finner dem med en gang
 local remotes = {}
@@ -37,6 +42,11 @@ Ting.init(Modeller, remotes, Spillere, Baser, Fuglemodell)
 Reiret.init(remotes, Spillere, Ting, Fuglemodell)
 Kamp.init(Modeller, remotes, Spillere, Baser, Ting)
 Handel.init(remotes, Spillere, Baser, Ting)
+Hendelser.init(remotes, Ting, Reiret)
+Robux.init(remotes, Spillere, Baser, Reiret, Ting)
+Ledertavle.init(Spillere, Ting, Verden)
+Ting.faktor = Spillere.faktor
+Kamp.vedFigur = Spillere.oppdaterFigur
 
 -- ---------------------------------------------------------------- spillere inn og ut
 
@@ -52,6 +62,7 @@ local function spillerInn(spiller)
 		remotes.Hendelse:FireClient(spiller, "melding", "All bases are taken! Try another server.")
 	end
 	Kamp.spillerInn(spiller)
+	task.spawn(Robux.sjekkPass, spiller)
 	Spillere.sendStatus(spiller)
 	if not p.lagres and Data.advarsel then
 		remotes.Hendelse:FireClient(spiller, "feil", Data.advarsel)
@@ -123,6 +134,30 @@ remotes.Handling.OnServerEvent:Connect(function(spiller, type_, a, b)
 		else
 			figur:SetAttribute("Emote", nil)
 		end
+	elseif type_ == "rebirth" then
+		local pris = Spillere.rebirthPris(spiller)
+		local feil
+		if Ting.baeres(spiller) then
+			feil = "Put down what you're carrying first"
+		elseif Handel.aktiv(spiller) then
+			feil = "Finish your trade first"
+		elseif Spillere.penger(spiller) < pris then
+			feil = "You need " .. Fugler.penger(pris) .. " to rebirth"
+		end
+		if feil then
+			remotes.Hendelse:FireClient(spiller, "feil", feil)
+			return
+		end
+		local p = Spillere.profil(spiller)
+		Ting.nullstill(spiller)
+		Baser.tomPott(spiller)
+		p.data.rebirths = (p.data.rebirths or 0) + 1
+		p.data.penger = Config.BASE.STARTPENGER
+		Spillere.giPenger(spiller, 0)
+		Spillere.oppdaterFigur(spiller)
+		Spillere.sendStatus(spiller)
+		remotes.Hendelse:FireAllClients("rebirth", spiller, p.data.rebirths)
+		task.spawn(Spillere.lagre, spiller, false)
 	elseif type_ == "triks" and TRIKS[a] then
 		for _, annen in Players:GetPlayers() do
 			if annen ~= spiller then

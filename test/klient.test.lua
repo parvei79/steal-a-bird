@@ -131,6 +131,7 @@ steg(4)
 figur:PivotTo(Kart.pengeplate(i) * CFrame.new(0, 3, 0))
 steg(0.5)
 sjekk(Klientdata.status.penger > 0, "pengene hentet og vist: $" .. Klientdata.status.penger)
+sjekk(Klientdata.status.veiledning == 4, "veiledningen er på mål 4 (stjel) etter kjøp, hjem og innhenting")
 
 -- ---------------------------------------------------------------- butikk
 Spillere.giPenger(spiller, 1000)
@@ -304,6 +305,38 @@ steg(0.2, 1 / 60)
 sjekk(tyvSt and tyvSt.vekt.ragdoll > 0.5, "tyven er en filledukke")
 steg(1.6, 1 / 30)
 sjekk(tyvSt and tyvSt.stjerner ~= nil, "stjerner rundt hodet på tyven")
+
+-- ---------------------------------------------------------------- gullregn og rebirth via knappene
+local Hendelser = krev("server/Hendelser")
+Hendelser.start("GoldenRain")
+steg(Config.HENDELSER.GULLREGN_INTERVALL + 2.5, 1 / 30)
+local hendelseVist = false
+for _, d in hudSkjerm:GetDescendants() do
+	if d:IsA("TextLabel") and string.find(d.Text, "GOLDEN EGG RAIN") then
+		hendelseVist = true
+	end
+end
+sjekk(hendelseVist, "Golden Egg Rain vises på skjermen")
+Hendelser.slutt()
+Spillere.giPenger(spiller, Config.REBIRTH.PRIS)
+steg(0.3)
+Menyer.aapne("Shop")
+steg(0.1)
+local function trykk(tekst)
+	for _, d in hudSkjerm.Shop:GetDescendants() do
+		if d:IsA("TextButton") and d.Text == tekst then
+			d.MouseButton1Click:Fire()
+			return true
+		end
+	end
+	return false
+end
+sjekk(trykk("⭐ ROBUX"), "Robux-fanen finnes")
+trykk("⬆️ UPGRADES")
+sjekk(trykk("REBIRTH") and trykk("YES, REBIRTH!"), "trykket REBIRTH og YES")
+steg(0.4)
+sjekk(Klientdata.status.rebirths == 1, "rebirth gjennomført via knappene")
+Menyer.lukk()
 
 print(string.format("Simulerte %.0f s.", Mock.tid()))
 print((#Mock.feil == 0 and feil == 0) and "INGEN FEIL" or ("FEIL: " .. (#Mock.feil + feil)))

@@ -12,13 +12,17 @@ Fugler.SJELDENHETER = {
 	{ id = "Epic", farge = Color3.fromRGB(185, 100, 255), vekt = 8, pris = 75000, inntekt = { 550, 750 }, klekk = 45 },
 	{ id = "Legendary", farge = Color3.fromRGB(255, 200, 40), vekt = 3.3, pris = 1000000, inntekt = { 3600, 4800 }, klekk = 60 },
 	{ id = "Mythic", farge = Color3.fromRGB(255, 70, 90), vekt = 0.7, pris = 15000000, inntekt = { 28000, 36000 }, klekk = 90 },
-	{ id = "Secret", farge = Color3.fromRGB(80, 255, 240), vekt = 0, pris = 0, inntekt = { 200000, 200000 }, klekk = 120 },
+	{ id = "Secret", farge = Color3.fromRGB(80, 255, 240), vekt = 0, pris = 25000000, inntekt = { 200000, 200000 }, klekk = 120 },
 }
 Fugler.SJ = {}
 for i, s in Fugler.SJELDENHETER do
 	s.nr = i
 	Fugler.SJ[s.id] = s
 end
+-- Gullegget (Golden Egg Rain) er ikke en egen sjeldenhet for fugler, men et egg-slag: det klekker en fugl
+-- med ekstra flaks og minst Gold-mutasjon.
+Fugler.SJ.Golden = { id = "Golden", nr = 0, farge = Color3.fromRGB(255, 215, 60), vekt = 0, pris = 20000,
+	inntekt = { 0, 0 }, klekk = 20 }
 
 -- ---------------------------------------------------------------- artene
 -- modell = navnet på 3D-modellen (fra Blender). vinge = "folda" (flakser ut fra siden) eller

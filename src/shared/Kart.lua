@@ -116,13 +116,15 @@ function Kart.lokal(i, lx, lz, ly)
 	return Kart.baseCF(i) * Vector3.new(lx, ly or 0, lz)
 end
 
-local SOKKEL_X = { -4.5, 4.5, -13.5, 13.5 }
+-- 20 sokler: 4 rader à 5. Rekkefølgen er midten først, så de første fuglene står fint.
+local SOKKEL_X = { 0, -9, 9, -18, 18 }
 local SOKKEL_Z = { -11, -2, 7, 16 }
+Kart.ANTALL_SOKLER = 20
 
--- Sokkel nr. n (1–16) i base i: CFrame på bakken, fuglen ser mot inngangen.
+-- Sokkel nr. n (1–20) i base i: CFrame på bakken, fuglen ser mot inngangen.
 function Kart.sokkel(i, n)
-	local rad = math.floor((n - 1) / 4) + 1
-	local kol = (n - 1) % 4 + 1
+	local rad = math.floor((n - 1) / 5) + 1
+	local kol = (n - 1) % 5 + 1
 	return Kart.baseCF(i) * CFrame.new(SOKKEL_X[kol], 0, SOKKEL_Z[rad])
 end
 
@@ -139,7 +141,7 @@ function Kart.skilt(i)
 end
 
 function Kart.spawn(i)
-	return Kart.baseCF(i) * CFrame.new(0, 3, 20)
+	return Kart.baseCF(i) * CFrame.new(0, 3, 21.5)
 end
 
 -- Inngangen (der broen kommer inn) og broens andre ende ved Reiret.

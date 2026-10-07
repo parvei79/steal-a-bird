@@ -17,6 +17,7 @@ local Kart = require(Shared:WaitForChild("Kart"))
 local Fugleliv = {}
 
 local alle = {} -- [Model] = tilstand
+Fugleliv.vedLanding = nil -- funksjon(pos) når et gullegg lander (effekter)
 local rad = math.rad
 
 local function A(x, y, z)
@@ -140,6 +141,19 @@ local function registrer(m)
 	alle[m] = st
 	if st.erFugl then
 		task.defer(pynt, st)
+	elseif m:GetAttribute("Sj") == "Golden" then
+		-- gulleggene lyser og glitrer, så de synes på avstand
+		local kropp = m:FindFirstChild("Kropp")
+		if kropp then
+			local lys = Instance.new("PointLight")
+			lys.Color = Color3.fromRGB(255, 210, 80)
+			lys.Range = 14
+			lys.Brightness = 2
+			lys.Parent = kropp
+			partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 8,
+				Lifetime = NumberRange.new(0.5, 1), Speed = NumberRange.new(0.5, 2), SpreadAngle = Vector2.new(180, 180),
+				LightEmission = 1, Size = NumberSequence.new(0.6, 0), Color = ColorSequence.new(Color3.fromRGB(255, 230, 120)) })
+		end
 	end
 	m.AncestryChanged:Connect(function()
 		if not m:IsDescendantOf(workspace) then
@@ -257,13 +271,29 @@ local function egg(st, naa, servertid)
 		local alder = servertid - start
 		local hopp = alder < 0.45 and math.sin(alder / 0.45 * math.pi) * 1.6 or 0
 		kroppCF = CFrame.new(0, hopp, 0) * A(0, 0, 9 * math.sin(t * 5))
+	elseif tilstand == "sluppet" and m:GetAttribute("Fall") and servertid - m:GetAttribute("Fall") < (m:GetAttribute("FallTid") or 0) then
+		-- et gullegg som faller fra himmelen (raskere og raskere), og spinner
+		local k = (servertid - m:GetAttribute("Fall")) / m:GetAttribute("FallTid")
+		kroppCF = CFrame.new(0, 80 * (1 - k * k), 0) * A(0, (t * 400) % 360, 0)
+		st.skalLande = true
 	elseif tilstand == "sluppet" then
+		if st.skalLande then
+			st.skalLande = false
+			local rot = m:FindFirstChild("Rot")
+			if rot and Fugleliv.vedLanding then
+				Fugleliv.vedLanding(rot.Position)
+			end
+		end
 		kroppCF = CFrame.new(0, 0.5 + 0.4 * math.sin(t * 3), 0) * A(0, (t * 90) % 360, 15 * math.sin(t * 2))
 		local igjen = (m:GetAttribute("SluppetTil") or 0) - servertid
 		local merke = m:FindFirstChild("Merke")
 		local tid = merke and merke:FindFirstChild("Tid")
 		if tid then
-			tid.Text = string.format("GRAB IT! %ds", math.max(0, math.ceil(igjen)))
+			if m:GetAttribute("Eier") == 0 then
+				tid.Text = string.format("FREE! GRAB IT! %ds", math.max(0, math.ceil(igjen)))
+			else
+				tid.Text = string.format("GRAB IT! %ds", math.max(0, math.ceil(igjen)))
+			end
 			tid.TextColor3 = Color3.fromRGB(255, 220, 80)
 		end
 	elseif tilstand == "baeres" then

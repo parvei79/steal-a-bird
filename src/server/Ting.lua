@@ -248,6 +248,20 @@ end
 
 -- ---------------------------------------------------------------- kjøp, stjel, snapp
 
+-- Et gratis egg uten eier som lander på `pos` (Golden Egg Rain). Hvem som helst kan snappe det når det
+-- har landet; ingen tar det før `ligger` sekunder har gått, så forsvinner det.
+function Ting.friEgg(sj, art, pos, ligger, fallTid)
+	nesteId += 1
+	local t = { id = nesteId, art = art, mut = nil, egg = true, sj = sj, gull = sj == "Golden" or nil,
+		klekk = Fugler.SJ[sj].klekk, eier = nil, fersk = true, tilstand = "sluppet",
+		landerTil = naa() + (fallTid or 0), sluppetTil = naa() + (fallTid or 0) + ligger }
+	alle[t.id] = t
+	lagModell(t, CFrame.new(pos) * CFrame.Angles(0, rng:NextNumber(0, math.pi * 2), 0))
+	t.modell:SetAttribute("Fall", naa())
+	t.modell:SetAttribute("FallTid", fallTid or 0)
+	return t
+end
+
 -- Nytt egg kjøpt på båndet (Reiret har sjekket pris og avstand). Kjøperen bærer det hjem.
 function Ting.kjopt(spiller, sj, art)
 	nesteId += 1
@@ -295,6 +309,9 @@ function Ting.ta(spiller, id)
 		return
 	end
 	if t.tilstand == "sluppet" then
+		if t.landerTil and naa() < t.landerTil then
+			return -- faller fortsatt
+		end
 		-- et mistet egg: den som snapper det, eier det (kjøperen kan også ta det tilbake)
 		if t.eier ~= spiller and not Ting.ledigSokkel(spiller) then
 			melding(spiller, "Your base is full!")
@@ -371,6 +388,10 @@ local function lever(spiller)
 		Spillere.funnet(spiller, t.art, t.mut)
 	end
 	Fjern.Hendelse:FireAllClients("levert", spiller, t.id)
+	Spillere.maal(spiller, "hjem")
+	if stjaalet then
+		Spillere.maal(spiller, "stjel")
+	end
 	Spillere.sendStatus(spiller)
 	if offer then
 		Spillere.sendStatus(offer)
@@ -428,6 +449,20 @@ function Ting.hjem(t)
 			melding(eier, "Your base was full, so the egg was refunded")
 		end
 		Ting.fjern(t)
+	end
+end
+
+-- Rebirth: alt spilleren eier forsvinner. Fugler som er stjålet fra spilleren og er på vei, får tyven beholde.
+function Ting.nullstill(spiller)
+	for _, t in alle do
+		if t.fra and t.fra.eier == spiller and t.baerer then
+			t.eier = t.baerer
+			t.fra = nil
+			t.fersk = true
+			settAttributter(t)
+		elseif t.eier == spiller then
+			Ting.fjern(t)
+		end
 	end
 end
 
@@ -493,7 +528,14 @@ local function klekk(t)
 			return
 		end
 		t.egg = false
-		t.mut = Fugler.trekkMutasjon(rng)
+		if t.gull then
+			-- gullegg: ekstra flaks og minst Gold
+			t.mut = Fugler.trekkMutasjon(rng, 3) or "Gold"
+			t.gull = nil
+		else
+			t.mut = Fugler.trekkMutasjon(rng)
+		end
+		t.sj = Fugler.ART[t.art].sj
 		t.klekker = false
 		local cf = t.modell.PrimaryPart.CFrame
 		lagModell(t, cf)
@@ -504,6 +546,11 @@ local function klekk(t)
 	end)
 end
 
+-- Inntektsfaktor for en spiller (rebirth, VIP). Settes av Main.
+Ting.faktor = function(_spiller)
+	return 1
+end
+
 function Ting.inntektFor(spiller)
 	local sum = 0
 	for _, t in alle do
@@ -511,7 +558,7 @@ function Ting.inntektFor(spiller)
 			sum += Fugler.inntekt(t.art, t.mut)
 		end
 	end
-	return sum
+	return math.floor(sum * Ting.faktor(spiller))
 end
 
 -- ---------------------------------------------------------------- lagring
@@ -532,7 +579,8 @@ function Ting.fuglerFor(spiller)
 		end
 		if plass then
 			brukt[plass] = true
-			table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = t.egg and math.ceil(t.klekk) or nil, s = plass })
+			table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = t.egg and math.ceil(t.klekk) or nil, s = plass,
+				g = t.gull or nil })
 		end
 	end
 	local n = 1
@@ -541,7 +589,7 @@ function Ting.fuglerFor(spiller)
 			n += 1
 		end
 		brukt[n] = true
-		table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = math.ceil(t.klekk), s = n })
+		table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = math.ceil(t.klekk), s = n, g = t.gull or nil })
 	end
 	return ut
 end
@@ -574,8 +622,9 @@ function Ting.lastInn(spiller, liste)
 	end
 	for n, f in brukt do
 		nesteId += 1
-		local sj = Fugler.ART[f.a].sj
-		local t = { id = nesteId, art = f.a, mut = f.m, egg = f.e == true, sj = sj,
+		local gull = f.e == true and f.g == true
+		local sj = gull and "Golden" or Fugler.ART[f.a].sj
+		local t = { id = nesteId, art = f.a, mut = f.m, egg = f.e == true, sj = sj, gull = gull or nil,
 			klekk = f.k or Fugler.SJ[sj].klekk, eier = spiller, tilstand = "plass", plass = n }
 		alle[t.id] = t
 		settPaaSokkel(t, spiller, n)
@@ -655,7 +704,7 @@ local function steg(dt)
 		for spiller, n in sum do
 			local i = Baser.til(spiller)
 			if i then
-				Baser.leggIPott(i, n)
+				Baser.leggIPott(i, math.floor(n * Ting.faktor(spiller)))
 			end
 		end
 	end

@@ -56,6 +56,17 @@ local visPenger = 0
 -- ---------------------------------------------------------------- basestatus og hjelp
 local baseTekst = UI.tekst({ AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 92),
 	Size = UDim2.fromOffset(420, 24), Text = "", TextColor3 = Color3.fromRGB(150, 230, 255) }, skjerm)
+local hendelseTekst = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -14, 0, 12),
+	Size = UDim2.fromOffset(330, 26), Text = "", TextXAlignment = Enum.TextXAlignment.Right,
+	TextColor3 = Color3.fromRGB(255, 230, 140) }, skjerm)
+local luckTekst = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -14, 0, 40),
+	Size = UDim2.fromOffset(330, 24), Text = "", TextXAlignment = Enum.TextXAlignment.Right,
+	TextColor3 = Color3.fromRGB(120, 255, 140) }, skjerm)
+local HENDELSE_NAVN = { GoldenRain = "🥚 Golden Egg Rain", CosmicNight = "🌙 Cosmic Night" }
+local function klokke(sek)
+	sek = math.max(0, math.ceil(sek))
+	return string.format("%d:%02d", math.floor(sek / 60), sek % 60)
+end
 local hjelp = UI.tekst({ AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -10),
 	Size = UDim2.fromOffset(980, 22), TextTransparency = 0.1,
 	Text = "HOLD LEFT MOUSE: hook  •  RELEASE: fly  •  WASD: swing  •  SPACE: reel  •  Q: trick  •  E: buy / steal  •  ALT: cursor" }, skjerm)
@@ -156,6 +167,22 @@ local function pil(farge)
 end
 local tyvPil = pil(Color3.fromRGB(255, 60, 60))
 local hjemPil = pil(Color3.fromRGB(90, 255, 120))
+local maalPil = pil(Color3.fromRGB(255, 220, 60))
+
+-- veiledning for nye spillere (øverst til venstre)
+local MAAL = {
+	"🥚 Buy an egg at the Nest in the middle",
+	"🏠 Carry the egg home to your base",
+	"💰 Stand on COLLECT to get your cash",
+	"😈 Steal a bird from another base (hold E)!",
+}
+local maalPanel = UI.panel({ Position = UDim2.fromOffset(12, 12), Size = UDim2.fromOffset(330, 74),
+	BackgroundTransparency = 0.2, Visible = false }, skjerm)
+local maalTittel = UI.tekst({ Position = UDim2.fromOffset(10, 4), Size = UDim2.new(1, -20, 0, 24), Text = "GOAL 1/4",
+	TextColor3 = Color3.fromRGB(255, 220, 60), TextXAlignment = Enum.TextXAlignment.Left }, maalPanel)
+local maalTekst = UI.tekst({ Position = UDim2.fromOffset(10, 30), Size = UDim2.new(1, -20, 0, 36), Text = "", TextWrapped = true,
+	TextXAlignment = Enum.TextXAlignment.Left }, maalPanel)
+local sistMaal = nil
 
 -- Pil langs skjermkanten som peker mot et punkt i verden (skjules når punktet er midt på skjermen).
 local function pekPaa(p, pos)
@@ -240,6 +267,59 @@ local function oppdater(dt)
 	else
 		baseTekst.Text = ""
 	end
+	-- hendelser og server luck
+	local hendelse = workspace:GetAttribute("Hendelse")
+	if hendelse then
+		hendelseTekst.Text = string.format("%s NOW! %s", string.upper(HENDELSE_NAVN[hendelse] or hendelse),
+			klokke((workspace:GetAttribute("HendelseSlutt") or servertid) - servertid))
+		hendelseTekst.TextColor3 = hendelse == "CosmicNight" and Color3.fromRGB(160, 230, 255) or Color3.fromRGB(255, 215, 60)
+	else
+		local neste = workspace:GetAttribute("NesteHendelse")
+		hendelseTekst.Text = neste and string.format("%s in %s", HENDELSE_NAVN[neste] or neste,
+			klokke((workspace:GetAttribute("NesteHendelseTid") or servertid) - servertid)) or ""
+		hendelseTekst.TextColor3 = Color3.fromRGB(255, 240, 200)
+	end
+	local luck = workspace:GetAttribute("LuckTil")
+	luckTekst.Text = (luck and luck > servertid) and ("🍀 SERVER LUCK x2  " .. klokke(luck - servertid)) or ""
+	-- veiledning: mål og gul pil
+	local maal = st.veiledning or 5
+	if st.base and maal <= #MAAL then
+		maalPanel.Visible = true
+		maalTittel.Text = string.format("GOAL %d/%d", maal, #MAAL)
+		maalTekst.Text = MAAL[maal]
+		if sistMaal and sistMaal ~= maal then
+			UI.sprett(maalPanel)
+		end
+		local mal = nil
+		local fig = spiller.Character
+		if maal == 1 then
+			mal = Vector3.new(Kart.REIR.x, Kart.REIR.topp + 2, Kart.REIR.z)
+		elseif maal == 3 then
+			mal = Kart.pengeplate(st.base).Position
+		elseif maal == 4 and not (fig and fig:GetAttribute("Baerer")) then
+			-- nærmeste base med en fugl som ikke er låst
+			local rot = fig and fig:FindFirstChild("HumanoidRootPart")
+			local best
+			for _, m in workspace:WaitForChild("Ting"):GetChildren() do
+				local b = m:GetAttribute("Base")
+				if b and b ~= st.base and b > 0 and m:GetAttribute("Tilstand") == "plass" and rot then
+					local p = m.PrimaryPart and m.PrimaryPart.Position
+					if p and (not best or (p - rot.Position).Magnitude < (best - rot.Position).Magnitude) then
+						best = p
+					end
+				end
+			end
+			mal = best
+		end
+		pekPaa(maalPil, mal)
+	else
+		maalPanel.Visible = false
+		maalPil.Visible = false
+		if sistMaal and sistMaal <= #MAAL and maal > #MAAL then
+			HUD.banner("🏆 You know how it works! Now get RICH! 🏆", Color3.fromRGB(255, 220, 60), 3)
+		end
+	end
+	sistMaal = maal
 	-- bærer du noe? pil hjem
 	local figur = spiller.Character
 	local baerer = figur and figur:GetAttribute("Baerer")

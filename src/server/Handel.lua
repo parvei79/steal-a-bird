@@ -28,6 +28,11 @@ local function annen(h, spiller)
 	return h.a == spiller and h.b or h.a
 end
 
+-- Er spilleren i et bytte?
+function Handel.aktiv(spiller)
+	return handler[spiller] ~= nil
+end
+
 -- Er tingen med i et pågående bytte?
 function Handel.laast(id)
 	for _, h in handler do
