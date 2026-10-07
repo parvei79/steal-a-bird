@@ -269,7 +269,7 @@ local function dyttUt(i)
 					sistDytt[annen] = t
 					local ut = Vector3.new(rot.Position.X - senter.X, 0, rot.Position.Z - senter.Z)
 					ut = ut.Magnitude > 0.1 and ut.Unit or Vector3.new(1, 0, 0)
-					Fjern.Knuff:FireClient(annen, ut * 70 + Vector3.new(0, 35, 0), 0.3, false)
+					Fjern.Knuff:FireClient(annen, ut * 45 + Vector3.new(0, 22, 0), 0.3, false)
 				end
 			end
 		end

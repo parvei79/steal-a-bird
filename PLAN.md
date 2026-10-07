@@ -38,13 +38,16 @@
 
 | Sjeldenhet | Sjanse på båndet | Eggpris | Penger/s | Klekketid | Fugler |
 |---|---|---|---|---|---|
-| Common | 45 % | $20 | 1–2 | 8 s | Pigeon, Sparrow, Seagull, Chicken, Duck, Crow |
-| Uncommon | 28 % | $300 | 8–12 | 15 s | Puffin, Toucan, Flamingo, Penguin, Kiwi |
-| Rare | 15 % | $4K | 55–80 | 30 s | Shoebill, Secretary Bird, Hoatzin, Cassowary, Peacock |
-| Epic | 8 % | $50K | 350–500 | 45 s | Harpy Eagle, Snowy Owl, Lyrebird, Quetzal, Dodo |
-| Legendary | 3,3 % | $750K | 2,6K–3,6K | 60 s | Archaeopteryx, Terror Bird, Haast's Eagle, Moa, Pterodactyl |
-| Mythic | 0,7 % | $10M | 18K–24K | 90 s | Phoenix, Ice Phoenix, Roc, Thunderbird |
-| **Secret** | bare i hendelser | — | 120K | 120 s | **Cosmic Shoebill** (Claude sitt valg) |
+| Common | 45 % | $40 | 2–4 | 8 s | Pigeon, Sparrow, Seagull, Chicken, Duck, Crow |
+| Uncommon | 28 % | $500 | 15–22 | 15 s | Puffin, Toucan, Flamingo, Penguin, Kiwi |
+| Rare | 15 % | $6K | 90–130 | 30 s | Shoebill, Secretary Bird, Hoatzin, Cassowary, Peacock |
+| Epic | 8 % | $75K | 550–750 | 45 s | Harpy Eagle, Snowy Owl, Lyrebird, Quetzal, Dodo |
+| Legendary | 3,3 % | $1M | 3,6K–4,8K | 60 s | Archaeopteryx, Terror Bird, Haast's Eagle, Moa, Pterodactyl |
+| Mythic | 0,7 % | $15M | 28K–36K | 90 s | Phoenix, Ice Phoenix, Roc, Thunderbird |
+| **Secret** | bare i hendelser | — | 200K | 120 s | **Cosmic Shoebill** (Claude sitt valg) |
+
+*Tallene står i `src/shared/Fugler.lua` og `Config.lua`. Det er lett å justere dem etter testing.
+Bare fugler som er laget i Blender, dukker opp på båndet. Foreløpig er 8 av 31 laget.*
 
 - **Fuglene er en blanding:**
   - rare ekte fugler: skonebbstork, hoatzin, kasuar
@@ -152,8 +155,8 @@ Senere kommer **Rebirth**: du starter på nytt og får mer inntekt for alltid.
 | Steg | Innhold |
 |---|---|
 | **0. Grunnmur** ✅ | Verktøy, tester og blokkfugler fra GRAPPLER |
-| **1. MVP** | Reiret med eggebånd, 8 baser, kjøpe og bære, klekke, penger, stjele, rykke, låse, nybegynnerskjold, lagring, alle spiller-animasjonene, 8 fugler |
-| **2. Fremgang** | Butikk med oppgraderinger, trading, samlebok, alle 31 fuglene og mutasjoner |
+| **1. MVP** ✅ | Reiret med eggebånd, 8 baser, kjøpe og bære, klekke, penger, stjele, rykke, låse, nybegynnerskjold, lagring, alle spiller-animasjonene, 8 fugler. Venter på test i Studio |
+| **2. Fremgang** | Butikk, trading, samlebok og mutasjoner ✅. Gjenstår: de 23 fuglene som mangler modell |
 | **3. Liv** | Golden Egg Rain, Cosmic Night, ledertavler, lyder og musikk overalt |
 | **4. Lansering** | Ikon og bilder, game passes, test med venner, publisering |
 | **5. Oppdateringer** | Rebirth, nye fugler, sesongegg |
