@@ -147,22 +147,23 @@ for info in R.MODELLER.values():
 # ------------------------------------------------------------------ tittel med omriss
 
 def tittel(tekst, pos, storrelse, rot_x=90, farge=(1.0, 0.72, 0.02)):
-    kurve = bpy.data.curves.new('tittel', 'FONT')
-    kurve.body = tekst
-    if os.path.exists(FONT):
-        kurve.font = bpy.data.fonts.load(FONT)
-    kurve.align_x = 'CENTER'
-    kurve.align_y = 'CENTER'
-    kurve.size = storrelse
-    kurve.extrude = storrelse * 0.08
-    kurve.bevel_depth = storrelse * 0.004
-    ob = bpy.data.objects.new('tittel', kurve)
-    bpy.context.scene.collection.objects.link(ob)
-    ob.location = pos
-    ob.rotation_euler = (math.radians(rot_x), 0, math.radians(180))  # står oppreist og leses mot kameraet (+Y)
-    bpy.context.view_layer.objects.active = ob
-    ob.select_set(True)
-    bpy.ops.object.convert(target='MESH')
+    """Tittel med mørkt omriss: en litt tykkere mørk kopi av teksten rett bak den gule."""
+    def lag(navn, tykkere, materiale, bak):
+        kurve = bpy.data.curves.new(navn, 'FONT')
+        kurve.body = tekst
+        if os.path.exists(FONT):
+            kurve.font = bpy.data.fonts.load(FONT, check_existing=True)
+        kurve.align_x = 'CENTER'
+        kurve.align_y = 'CENTER'
+        kurve.size = storrelse
+        kurve.extrude = storrelse * 0.06
+        kurve.offset = tykkere
+        ob = bpy.data.objects.new(navn, kurve)
+        bpy.context.scene.collection.objects.link(ob)
+        ob.location = (pos[0], pos[1] - bak, pos[2])
+        ob.rotation_euler = (math.radians(rot_x), 0, math.radians(180))  # står oppreist og leses mot kameraet (+Y)
+        ob.data.materials.append(materiale)
+        return ob
     gul = bpy.data.materials.new('tittelgul')
     gul.use_nodes = True
     p = gul.node_tree.nodes['Principled BSDF']
@@ -176,16 +177,8 @@ def tittel(tekst, pos, storrelse, rot_x=90, farge=(1.0, 0.72, 0.02)):
     svart = bpy.data.materials.new('omriss')
     svart.use_nodes = True
     svart.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (0.05, 0.03, 0.08, 1)
-    svart.use_backface_culling = True
-    ob.data.materials.append(gul)
-    ob.data.materials.append(svart)
-    mod = ob.modifiers.new('omriss', 'SOLIDIFY')
-    mod.thickness = storrelse * 0.05
-    mod.offset = 1
-    mod.use_flip_normals = True
-    mod.material_offset = 1
-    ob.select_set(False)
-    return ob
+    lag('tittel', 0.0, gul, 0.0)
+    lag('tittelOmriss', storrelse * 0.055, svart, storrelse * 0.1)
 
 
 # ------------------------------------------------------------------ lys og bakgrunn

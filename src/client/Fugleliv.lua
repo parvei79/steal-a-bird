@@ -72,6 +72,26 @@ local function pynt(st)
 		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 6,
 			Lifetime = NumberRange.new(0.15, 0.3), Speed = NumberRange.new(4, 8), SpreadAngle = Vector2.new(180, 180),
 			LightEmission = 1, Size = NumberSequence.new(0.6, 0), Color = ColorSequence.new(Color3.fromRGB(255, 250, 140)) })
+	elseif effekt == "sno" then
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 5,
+			Lifetime = NumberRange.new(1.2, 2), Speed = NumberRange.new(0.3, 0.8), SpreadAngle = Vector2.new(40, 40),
+			EmissionDirection = Enum.NormalId.Top, Acceleration = Vector3.new(0, -1.5, 0), LightEmission = 0.4,
+			Size = NumberSequence.new(0.35, 0.2), Color = ColorSequence.new(Color3.fromRGB(255, 255, 255)) })
+	elseif effekt == "stink" then
+		partikler(kropp, { Texture = "rbxasset://textures/particles/smoke_main.dds", Rate = 2,
+			Lifetime = NumberRange.new(1.5, 2.5), Speed = NumberRange.new(0.5, 1.2), SpreadAngle = Vector2.new(30, 30),
+			EmissionDirection = Enum.NormalId.Top, Transparency = NumberSequence.new(0.6, 1),
+			Size = NumberSequence.new(0.8, 2.2), Color = ColorSequence.new(Color3.fromRGB(150, 170, 80)) })
+	elseif effekt == "glitter" then
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 7,
+			Lifetime = NumberRange.new(0.5, 1), Speed = NumberRange.new(0.3, 1), SpreadAngle = Vector2.new(180, 180),
+			LightEmission = 1, Size = NumberSequence.new(0.5, 0),
+			Color = ColorSequence.new(Color3.fromRGB(80, 230, 220), Color3.fromRGB(255, 220, 90)) })
+	elseif effekt == "gull" then
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 9,
+			Lifetime = NumberRange.new(0.6, 1.2), Speed = NumberRange.new(0.5, 1.5), SpreadAngle = Vector2.new(180, 180),
+			LightEmission = 1, Size = NumberSequence.new(0.6, 0),
+			Color = ColorSequence.new(Color3.fromRGB(255, 225, 90), Color3.fromRGB(255, 255, 220)) })
 	elseif effekt == "kosmos" then
 		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 8,
 			Lifetime = NumberRange.new(0.8, 1.6), Speed = NumberRange.new(0.3, 1), SpreadAngle = Vector2.new(180, 180),
@@ -85,6 +105,35 @@ local function pynt(st)
 			Lifetime = NumberRange.new(0.5, 1), Speed = NumberRange.new(0.2, 0.8), SpreadAngle = Vector2.new(180, 180),
 			LightEmission = 1, Size = NumberSequence.new(0.5, 0), Color = ColorSequence.new(farge, Color3.new(1, 1, 1)) })
 	end
+end
+
+-- En tekst som stiger opp og forsvinner over fuglen («+$12», «♪»).
+local function stigendeTekst(st, tekst, farge, hoyde)
+	local rot = st.modell:FindFirstChild("Rot")
+	if not rot then
+		return
+	end
+	local gui = Instance.new("BillboardGui")
+	gui.Size = UDim2.fromOffset(110, 34)
+	gui.StudsOffsetWorldSpace = Vector3.new((math.random() - 0.5) * 1.5, (st.modell:GetAttribute("Topp") or 4) + (hoyde or 0.5), 0)
+	gui.LightInfluence = 0
+	gui.MaxDistance = 60
+	gui.Adornee = rot
+	local t = Instance.new("TextLabel")
+	t.Size = UDim2.fromScale(1, 1)
+	t.BackgroundTransparency = 1
+	t.Font = Enum.Font.FredokaOne
+	t.TextScaled = true
+	t.Text = tekst
+	t.TextColor3 = farge
+	t.TextStrokeTransparency = 0.2
+	t.Parent = gui
+	gui.Parent = st.modell
+	TweenService:Create(gui, TweenInfo.new(1.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{ StudsOffsetWorldSpace = gui.StudsOffsetWorldSpace + Vector3.new(0, 2.2, 0) }):Play()
+	TweenService:Create(t, TweenInfo.new(1.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{ TextTransparency = 1, TextStrokeTransparency = 1 }):Play()
+	Debris:AddItem(gui, 1.2)
 end
 
 -- «+$12» som spretter opp fra fuglen
@@ -138,6 +187,7 @@ local function registrer(m)
 	}
 	local art = Fugler.ART[m:GetAttribute("Art") or ""]
 	st.spredt = art and art.vinge == "spredt"
+	st.noter = art and art.effekt == "noter"
 	alle[m] = st
 	if st.erFugl then
 		task.defer(pynt, st)
@@ -210,6 +260,14 @@ local function fugl(st, naa, servertid)
 			local rot = m:FindFirstChild("Rot")
 			if rot and (rot.Position - kamera.CFrame.Position).Magnitude < 60 then
 				pengeTekst(st, math.floor(inntekt * intervall))
+			end
+		end
+		if st.noter and naa > (st.nesteNote or 0) then
+			st.nesteNote = naa + 1.2 + math.random() * 2
+			local kamera = workspace.CurrentCamera
+			local rot = m:FindFirstChild("Rot")
+			if rot and (rot.Position - kamera.CFrame.Position).Magnitude < 60 then
+				stigendeTekst(st, math.random() < 0.5 and "♪" or "♫", Color3.fromRGB(255, 230, 120), 0.2)
 			end
 		end
 		if st.hoppStart and naa - st.hoppStart < 0.38 then

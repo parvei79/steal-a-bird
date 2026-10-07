@@ -33,8 +33,13 @@ R.eksporter_glb(os.path.join(ROT, 'assets', 'FuglModeller.glb'), 'FuglModeller')
 print(f'Eksporterte {len(R.MODELLER)} modeller til assets/FuglModeller.glb')
 
 if '--uten-bilder' not in ARGS:
+    import re
     mappe = os.path.join(ROT, 'assets', 'previews')
-    fugler.render(mappe, list(fugler.FUGLER), filnavn='_fugler.png', kolonner=4, retning=(1.0, 1.05, 0.7))
+    # samme rekkefølge som katalogen i spillet (Common -> Secret)
+    with open(os.path.join(ROT, 'src', 'shared', 'Fugler.lua'), encoding='utf-8') as fh:
+        katalog = re.findall(r'\{ id = "(\w+)", navn = ', fh.read())
+    rekke = [n for n in katalog if n in fugler.FUGLER] + [n for n in fugler.FUGLER if n not in katalog]
+    fugler.render(mappe, rekke, filnavn='_fugler.png', oppl=384, kolonner=6, retning=(1.0, 1.05, 0.7))
     rekv = [n for n in R.MODELLER if not any(n == f or n.startswith(f + '_') for f in fugler.FUGLER)]
     R.render_forhandsvisning(mappe, bare=rekv, filnavn='_ark.png')
 print('Ferdig.')

@@ -34,14 +34,23 @@ class Fugl:
         punkter = dict(self.punkter)
         punkter['hengselH'] = (hx, hy, hz)
         punkter['hengselV'] = (-hx, hy, hz)
+        hoyre = self.vinge
+        venstre = self.vinge.speilet()
+        # Der en vinge- (eller ekstra-)kube ligger på samme sted som en kroppskube, får den kroppens farge.
+        # Ellers ligger to flater med ulik farge oppå hverandre og flimrer i Roblox (z-fighting).
+        for del_ in (hoyre, venstre, self.ekstra):
+            if del_ is not None:
+                for c in del_.celler:
+                    if c in self.kropp.celler:
+                        del_.celler[c] = self.kropp.celler[c]
         R.ny_modell()
         self.kropp.lag()
         R.ferdig_modell(navn, punkter=punkter)
         R.ny_modell()
-        self.vinge.lag()
+        hoyre.lag()
         R.ferdig_modell(navn + '_VingeH')
         R.ny_modell()
-        self.vinge.speilet().lag()
+        venstre.lag()
         R.ferdig_modell(navn + '_VingeV')
         if self.ekstra is not None:
             R.ny_modell()
