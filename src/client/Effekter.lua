@@ -232,6 +232,33 @@ local function myntregn(fra, til, antall)
 	end
 end
 
+-- Mynter som flyr over skjermen og inn i pengetelleren (fra et punkt i verden).
+local function skjermMynter(fra, antall)
+	local kam = workspace.CurrentCamera
+	local sp = kam:WorldToViewportPoint(fra)
+	local start = Vector2.new(sp.X, sp.Y)
+	if sp.Z < 0 then
+		start = kam.ViewportSize / 2
+	end
+	local maal = HUD.pengePos and HUD.pengePos()
+	if not maal then
+		return
+	end
+	for n = 1, antall do
+		task.delay(n * 0.05, function()
+			local m = UI.tekst({ AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(34, 34), Text = "🪙",
+				Position = UDim2.fromOffset(start.X + math.random(-40, 40), start.Y + math.random(-30, 30)) }, HUD.skjerm)
+			local tw = TweenService:Create(m, TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+				{ Position = UDim2.fromOffset(maal.X, maal.Y), Size = UDim2.fromOffset(20, 20) })
+			tw:Play()
+			task.delay(0.55, function()
+				m:Destroy()
+				HUD.pengerSprett()
+			end)
+		end)
+	end
+end
+
 -- Et lysende spor som flyr fra der en ting ble mistet og hjem til sokkelen.
 local function hjemflukt(fra, til, farge)
 	if not fra or not til then
@@ -424,6 +451,7 @@ local function serverHendelse(type_, a, b, c, d, e)
 			lyd2D(L.mynter, 0.8, 1)
 			local rot = spiller.Character and spiller.Character:FindFirstChild("HumanoidRootPart")
 			myntregn(c, rot and rot.Position or c, math.clamp(math.floor(math.log10(math.max(b, 1)) * 3), 4, 16))
+			task.delay(0.5, skjermMynter, rot and rot.Position or c, 8)
 			HUD.melding("+" .. Fugler.penger(b) .. " collected! 💰", Color3.fromRGB(120, 255, 140), 2.5)
 		else
 			burst(c + Vector3.new(0, 1, 0), Color3.fromRGB(255, 215, 60), 10, 12, 0.5)

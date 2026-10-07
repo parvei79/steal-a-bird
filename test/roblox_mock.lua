@@ -197,7 +197,8 @@ local ARV = {
 	Weld = "JointInstance", Motor6D = "JointInstance", WeldConstraint = "Instance",
 	AlignOrientation = "Constraint", LinearVelocity = "Constraint",
 	ScreenGui = "LayerCollector", BillboardGui = "LayerCollector", SurfaceGui = "LayerCollector",
-	TextLabel = "GuiObject", Frame = "GuiObject", ImageLabel = "GuiObject",
+	TextLabel = "GuiObject", Frame = "GuiObject", ImageLabel = "GuiObject", TextButton = "GuiObject",
+	ScrollingFrame = "GuiObject", ImageButton = "GuiObject", TextBox = "GuiObject",
 	Folder = "Instance", Model = "PVInstance",
 }
 
@@ -217,6 +218,7 @@ local STANDARD = {
 	Motor6D = { C0 = CFrame.new(), C1 = CFrame.new(), Transform = CFrame.new(), Enabled = true },
 	AlignOrientation = { CFrame = CFrame.new(), Responsiveness = 10 },
 	LinearVelocity = { VectorVelocity = Vector3.zero },
+	GuiObject = { AbsolutePosition = Vector2.zero, AbsoluteSize = Vector2.new(100, 50), Visible = true },
 }
 
 local metoder = {}
