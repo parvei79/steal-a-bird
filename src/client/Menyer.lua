@@ -11,6 +11,7 @@ local ModelInfo = require(Shared:WaitForChild("ModelInfo"))
 local MarketplaceService = game:GetService("MarketplaceService")
 local UI = require(script.Parent:WaitForChild("UI"))
 local Klientdata = require(script.Parent:WaitForChild("Klientdata"))
+local Fuglebilde = require(script.Parent:WaitForChild("Fuglebilde"))
 
 local Menyer = {}
 
@@ -230,30 +231,33 @@ end
 -- ---------------------------------------------------------------- INDEX
 
 local function lagIndex(skjerm)
-	local v = UI.vindu("Index", "📖 BIRD INDEX", UDim2.fromOffset(760, 520), skjerm, Menyer.lukk)
+	local v = UI.vindu("Index", "📖 BIRD INDEX", UDim2.fromOffset(800, 560), skjerm, Menyer.lukk)
 	local teller = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -70, 0, 14), Size = UDim2.fromOffset(220, 32),
 		Text = "", TextColor3 = F.gul, TextXAlignment = Enum.TextXAlignment.Right }, v)
 	local rulle = UI.ny("ScrollingFrame", { Position = UDim2.fromOffset(14, 62), Size = UDim2.new(1, -28, 1, -76),
 		BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 8, AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		CanvasSize = UDim2.new() }, v)
-	UI.ny("UIGridLayout", { CellSize = UDim2.fromOffset(170, 96), CellPadding = UDim2.fromOffset(10, 10),
+	UI.ny("UIGridLayout", { CellSize = UDim2.fromOffset(176, 168), CellPadding = UDim2.fromOffset(8, 8),
 		SortOrder = Enum.SortOrder.LayoutOrder }, rulle)
 	local kort = {}
 	for i, a in Fugler.ARTER do
 		local sj = Fugler.SJ[a.sj]
 		local k = UI.rund(UI.ny("Frame", { BackgroundColor3 = F.panel2, LayoutOrder = i, BorderSizePixel = 0 }, rulle), 12)
 		UI.ny("UIStroke", { Thickness = 3, Color = sj.farge }, k)
-		local navn = UI.tekst({ Position = UDim2.fromOffset(6, 6), Size = UDim2.new(1, -12, 0, 28), Text = "???" }, k)
-		local sjT = UI.tekst({ Position = UDim2.fromOffset(6, 34), Size = UDim2.new(1, -12, 0, 20), Text = a.sj,
+		local bilde = UI.ny("ViewportFrame", { Position = UDim2.fromOffset(6, 4), Size = UDim2.new(1, -12, 0, 96),
+			BackgroundTransparency = 1 }, k)
+		local navn = UI.tekst({ Position = UDim2.fromOffset(6, 100), Size = UDim2.new(1, -12, 0, 24), Text = "???" }, k)
+		local sjT = UI.tekst({ Position = UDim2.fromOffset(6, 124), Size = UDim2.new(1, -12, 0, 18), Text = a.sj,
 			TextColor3 = sj.farge }, k)
-		local mut = UI.tekst({ Position = UDim2.fromOffset(6, 58), Size = UDim2.new(1, -12, 0, 30), Text = "" }, k)
-		kort[a.id] = { navn = navn, sj = sjT, mut = mut, a = a, k = k }
+		local mut = UI.tekst({ Position = UDim2.fromOffset(6, 142), Size = UDim2.new(1, -12, 0, 22), Text = "" }, k)
+		kort[a.id] = { navn = navn, sj = sjT, mut = mut, a = a, k = k, bilde = bilde }
 	end
 	local function oppdater(st)
 		local idx = st.index or {}
 		local funnet = 0
 		for id, k in kort do
 			local side = idx[id]
+			pcall(Fuglebilde.vis, k.bilde, id, not side)
 			if side then
 				funnet += 1
 				k.navn.Text = k.a.navn

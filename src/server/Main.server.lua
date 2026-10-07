@@ -33,7 +33,19 @@ remoteMappe.Parent = ReplicatedStorage
 
 Data.init()
 Modeller.init()
-Modeller.delMedKlient({ "Krok", "Mynt", "Skallbit" })
+-- klientene får kopier av kroken, mynten, skallbitene og alle fuglene (til samleboka og effekter)
+do
+	local ModelInfo = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("ModelInfo"))
+	local navn = { "Krok", "Mynt", "Skallbit" }
+	for _, a in Fugler.ARTER do
+		for _, del in { "", "_VingeH", "_VingeV", "_Ekstra" } do
+			if ModelInfo[a.modell .. del] then
+				table.insert(navn, a.modell .. del)
+			end
+		end
+	end
+	Modeller.delMedKlient(navn)
+end
 Fuglemodell.init(Modeller)
 Spillere.init(remotes)
 Verden.bygg(Modeller)
