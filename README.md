@@ -14,6 +14,14 @@ fuglene fra de andres baser! Rykk tyvene ned fra himmelen før de stikker av med
 - Kode-animasjoner på figurene: svingepositur i tauet, salto og skru, superhelt-landing, ragdoll, svimmel,
   bærepositur, lysspor og fartsstreker.
 - Alt er blokkstil: øyene er bygget av kuber, og fuglene er voksel-figurer laget med kode i Blender.
+- **Hendelser:**
+  - **Golden Egg Rain** (hvert 12. minutt): gullegg faller ned på øyene, og alle kjemper om dem.
+  - **Cosmic Night** (hvert 25. minutt): natt, mer flaks, og Secret-egg med Cosmic Shoebill på båndet.
+- **Rebirth:** du starter på nytt, og fuglene tjener +50 % for alltid. Du får også nye taufarger.
+- **Globale topplister** på Reiret, og en **veiledning** med fire mål for nye spillere.
+- **Robux:**
+  - game passes: VIP, Auto Collect, +4 Base Slots og Rainbow Rope
+  - produkter: Server Luck og Cash Pack
 
 Spillteksten er på engelsk. Planen står i `PLAN.md`.
 
@@ -42,12 +50,22 @@ python3 tools/bygg_place.py
 | Butikk, samlebok, trading, dans | F, G, T, B (dans direkte: 1–4) | Knappene til venstre |
 | Fri musepeker (for å klikke) | ALT | – |
 
+## Robux (når spillet er publisert)
+
+1. På create.roblox.com → spillet → **Monetization** → **Passes**: lag VIP, Auto Collect, +4 Base Slots og
+   Rainbow Rope (bilde + pris). Under **Developer Products**: lag Server Luck og Cash Pack.
+2. Kopier ID-ene inn i `Config.ROBUX` i `src/shared/Config.lua` (`passId`/`produktId`), og bygg place-fila på nytt.
+   Så lenge ID-en er 0, viser butikken «Soon».
+
+Ikon og bilde til spillsiden: `assets/ikon.png` og `assets/thumbnail.png` (lages med `tools/blender/ikon.py`).
+
 ## Tester
 
 ```bash
 python3 tools/test_luau.py test/kart.test.lua --data /tmp/kart.json && python3 tools/vis_kart.py /tmp/kart.json -o assets/previews/_kart.png
 python3 tools/test_luau.py test/server.test.lua --mock   # kjøp, klekk, penger, stjel, rykk, lås, salg, bytte, lagring
 python3 tools/test_luau.py test/klient.test.lua --mock   # hele spillet med den ekte klientkoden og animasjonene
+python3 tools/test_luau.py test/hendelser.test.lua --mock # gullregn, Cosmic Night, rebirth og Robux-kjøp
 ```
 
 Juster følelsen og økonomien i `src/shared/Config.lua` og `src/shared/Fugler.lua`, og kartet i `src/shared/Kart.lua`.

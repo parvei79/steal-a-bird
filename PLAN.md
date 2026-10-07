@@ -157,9 +157,9 @@ Senere kommer **Rebirth**: du starter på nytt og får mer inntekt for alltid.
 | **0. Grunnmur** ✅ | Verktøy, tester og blokkfugler fra GRAPPLER |
 | **1. MVP** ✅ | Reiret med eggebånd, 8 baser, kjøpe og bære, klekke, penger, stjele, rykke, låse, nybegynnerskjold, lagring, alle spiller-animasjonene, 8 fugler. Venter på test i Studio |
 | **2. Fremgang** | Butikk, trading, samlebok og mutasjoner ✅. Gjenstår: de 23 fuglene som mangler modell |
-| **3. Liv** | Golden Egg Rain, Cosmic Night, ledertavler, lyder og musikk overalt |
-| **4. Lansering** | Ikon og bilder, game passes, test med venner, publisering |
-| **5. Oppdateringer** | Rebirth, nye fugler, sesongegg |
+| **3. Liv** ✅ | Golden Egg Rain, Cosmic Night, globale topplister, veiledning for nye spillere, lyder og musikk |
+| **4. Lansering** | Ikon og bilder ✅, game passes og produkter ✅ (ID-ene må lages). Gjenstår: test med venner, publisering |
+| **5. Oppdateringer** | Rebirth ✅. Senere: nye fugler, sesongegg |
 
 ## 12. Risiko
 
