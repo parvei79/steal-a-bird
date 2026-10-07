@@ -397,8 +397,16 @@ function HUD.start(grappler, kamera, remotes)
 		end
 	end)
 
-	-- musikk og fuglesang
+	-- musikk og fuglesang (🔊-knappen nede til venstre skrur musikken av og på)
 	local musikk = UI.ny("Sound", { Volume = 0.18 }, workspace.CurrentCamera)
+	local paa = true
+	local lydKnapp
+	lydKnapp = UI.knapp({ AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 12, 1, -12), Size = UDim2.fromOffset(56, 48),
+		Text = "🔊", BackgroundColor3 = UI.FARGER.panel2 }, skjerm, function()
+		paa = not paa
+		musikk.Volume = paa and 0.18 or 0
+		lydKnapp.Text = paa and "🔊" or "🔇"
+	end)
 	local n = 0
 	local function neste()
 		n = n % #Config.MUSIKK + 1
