@@ -419,7 +419,8 @@ function Ting.mistet(spiller, grunn)
 		end
 		return
 	end
-	if t.fersk and (grunn == "rykk" or grunn == "spark") and pos.Y > Config.FALL_GRENSE + 20 then
+	local slengt = grunn == "rykk" or grunn == "spark" or grunn == "lyn" or grunn == "meteor"
+	if t.fersk and slengt and pos.Y > Config.FALL_GRENSE + 20 then
 		-- nykjøpt egg: svever der det ble mistet, og hvem som helst kan snappe det
 		t.tilstand = "sluppet"
 		t.baerer = nil
@@ -528,13 +529,15 @@ local function klekk(t)
 			return
 		end
 		t.egg = false
-		if t.gull then
+		if t.sj == "Golden" then
 			-- gullegg: ekstra flaks og minst Gold
 			t.mut = Fugler.trekkMutasjon(rng, 3) or "Gold"
-			t.gull = nil
+		elseif t.sj == "Meteor" then
+			t.mut = Fugler.trekkMutasjon(rng, 2)
 		else
 			t.mut = Fugler.trekkMutasjon(rng)
 		end
+		t.gull = nil
 		t.sj = Fugler.ART[t.art].sj
 		t.klekker = false
 		local cf = t.modell.PrimaryPart.CFrame
@@ -551,11 +554,24 @@ Ting.faktor = function(_spiller)
 	return 1
 end
 
+-- Ekstra faktor for én fugl (f.eks. Thunderbird i stormen). Settes av Hendelser.
+Ting.bonus = function(_t)
+	return 1
+end
+
+-- Spesielle egg (Golden, Meteor, Spooky) lagres med typen sin, vanlige egg uten.
+function Ting.eggtype(t)
+	if t.egg and Fugler.SJ[t.sj] and Fugler.SJ[t.sj].nr == 0 then
+		return t.sj
+	end
+	return nil
+end
+
 function Ting.inntektFor(spiller)
 	local sum = 0
 	for _, t in alle do
 		if t.eier == spiller and not t.egg and t.tilstand == "plass" then
-			sum += Fugler.inntekt(t.art, t.mut)
+			sum += Fugler.inntekt(t.art, t.mut) * Ting.bonus(t)
 		end
 	end
 	return math.floor(sum * Ting.faktor(spiller))
@@ -580,7 +596,7 @@ function Ting.fuglerFor(spiller)
 		if plass then
 			brukt[plass] = true
 			table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = t.egg and math.ceil(t.klekk) or nil, s = plass,
-				g = t.gull or nil })
+				ek = Ting.eggtype(t) })
 		end
 	end
 	local n = 1
@@ -589,7 +605,7 @@ function Ting.fuglerFor(spiller)
 			n += 1
 		end
 		brukt[n] = true
-		table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = math.ceil(t.klekk), s = n, g = t.gull or nil })
+		table.insert(ut, { a = t.art, m = t.mut, e = t.egg, k = math.ceil(t.klekk), s = n, ek = Ting.eggtype(t) })
 	end
 	return ut
 end
@@ -622,9 +638,12 @@ function Ting.lastInn(spiller, liste)
 	end
 	for n, f in brukt do
 		nesteId += 1
-		local gull = f.e == true and f.g == true
-		local sj = gull and "Golden" or Fugler.ART[f.a].sj
-		local t = { id = nesteId, art = f.a, mut = f.m, egg = f.e == true, sj = sj, gull = gull or nil,
+		local ek = f.e == true and (f.ek or (f.g and "Golden")) or nil
+		if ek and not Fugler.SJ[ek] then
+			ek = nil
+		end
+		local sj = ek or Fugler.ART[f.a].sj
+		local t = { id = nesteId, art = f.a, mut = f.m, egg = f.e == true, sj = sj, gull = ek == "Golden" or nil,
 			klekk = f.k or Fugler.SJ[sj].klekk, eier = spiller, tilstand = "plass", plass = n }
 		alle[t.id] = t
 		settPaaSokkel(t, spiller, n)
@@ -698,7 +717,7 @@ local function steg(dt)
 		local sum = {}
 		for _, t in alle do
 			if not t.egg and t.tilstand == "plass" and t.eier then
-				sum[t.eier] = (sum[t.eier] or 0) + Fugler.inntekt(t.art, t.mut)
+				sum[t.eier] = (sum[t.eier] or 0) + Fugler.inntekt(t.art, t.mut) * Ting.bonus(t)
 			end
 		end
 		for spiller, n in sum do

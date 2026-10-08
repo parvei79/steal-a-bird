@@ -87,7 +87,25 @@ Config.HENDELSER = {
 	KOSMISK_VARER = 180,
 	KOSMISK_SJANSE = 0.04,   -- sjanse for at et nytt egg på båndet er et Secret-egg (Cosmic Shoebill)
 	KOSMISK_FLAKS = 3,
+	STORM_FORST = 600,       -- Storm etter 10 minutter
+	STORM_HVERT = 1080,      -- og så hvert 18. minutt
+	STORM_VARER = 100,
+	STORM_VIND = 26,         -- hvor hardt vinden dytter deg i lufta (studs/s²)
+	LYN_INTERVALL = 3.5,     -- sekunder mellom lynnedslagene
+	LYN_VARSEL = 1.6,        -- så lenge den lysende ringen varsler før lynet slår ned
+	LYN_RADIUS = 9,
+	THUNDERBIRD_BONUS = 3,   -- Thunderbird (og andre lyn-fugler) tjener x3 i stormen
+	METEOR_FORST = 1200,     -- Meteor Egg etter 20 minutter
+	METEOR_HVERT = 900,      -- og så hvert 15. minutt
+	METEOR_VARSEL = 12,      -- sekunder fra «METEOR INCOMING» til nedslaget
+	METEOR_RADIUS = 13,      -- spillere så nær nedslaget blir slengt vekk
+	METEOR_LIGGER = 60,      -- så lenge meteoregget ligger før det forsvinner
 }
+
+-- ---------------------------------------------------------------- sesonger
+-- "auto" = Halloween i oktober (og første uka i november). Sett "Halloween" eller nil for å tvinge.
+Config.SESONG = "auto"
+Config.SPOOKY_SJANSE = 0.08      -- sjansen for at et nytt egg på båndet er et Spooky Egg i Halloween-sesongen
 
 -- ---------------------------------------------------------------- rebirth
 Config.REBIRTH = {
@@ -152,6 +170,12 @@ Config.LYD = {
 	tungLanding = id(9118617342), -- Rock Impact Large Hit Scrape 1
 	floyte = id(9119198140),      -- Slide Whistle 4 (når du blir rykket)
 	fuglesang = id(9118752742),   -- Rural Daytime Ext Birds Tweeting Chirping 1 (bakgrunn)
+	torden = id(9120018172),      -- Thunder Distant Boom Thud Rapid Hits 20
+	lyn = id(9116282875),         -- Lightning Strike Sharp Hissing Crack 5
+	regn = id(9112853287),        -- Rain Heavy 1 (løkke)
+	ildkule = id(9114428537),     -- Fireball 1 (meteoren faller)
+	smell = id(9117876706),       -- Power Explosions Big Heavy Searing Boom 2 (nedslaget)
+	spokelse = id(9119464660),    -- Spirit Fly Bys Spooky Windy Airy Pass Bys 7
 }
 Config.MUSIKK = {
 	id(1839885740), -- Flying So High (APM)

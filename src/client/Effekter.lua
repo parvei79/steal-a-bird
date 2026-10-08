@@ -357,6 +357,106 @@ function Effekter.egen(liste)
 	end
 end
 
+-- ---------------------------------------------------------------- storm og meteor
+
+-- En lysende ring på bakken som varsler et nedslag (lyn eller meteor). Krymper mot tidspunktet.
+local function varselRing(pos, treff, radius, farge)
+	local ring = del({ Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.2, radius * 2, radius * 2),
+		CFrame = CFrame.new(pos + Vector3.new(0, 0.25, 0)) * CFrame.Angles(0, 0, math.rad(90)), Material = Enum.Material.Neon,
+		Color = farge, Transparency = 0.55 })
+	local forb
+	forb = RunService.RenderStepped:Connect(function()
+		local igjen = treff - workspace:GetServerTimeNow()
+		if igjen <= 0 or not ring.Parent then
+			forb:Disconnect()
+			ring:Destroy()
+			return
+		end
+		ring.Transparency = 0.35 + 0.35 * math.abs(math.sin(os.clock() * (8 + 10 / math.max(igjen, 0.3))))
+	end)
+	return ring
+end
+
+-- Et lyn: sikksakk av lysende biter fra himmelen og ned, blits, smell og torden.
+local blits
+local function lynNedslag(pos)
+	local topp = pos + Vector3.new(math.random(-8, 8), 160, math.random(-8, 8))
+	local forrige = topp
+	for n = 1, 8 do
+		local t = n / 8
+		local p = topp:Lerp(pos, t) + (n < 8 and Vector3.new(math.random(-5, 5), 0, math.random(-5, 5)) or Vector3.zero)
+		local lengde = (p - forrige).Magnitude
+		local d = del({ Size = Vector3.new(0.6, 0.6, lengde), CFrame = CFrame.lookAt((p + forrige) / 2, p),
+			Material = Enum.Material.Neon, Color = Color3.fromRGB(220, 235, 255) })
+		TweenService:Create(d, TweenInfo.new(0.35), { Transparency = 1 }):Play()
+		Debris:AddItem(d, 0.4)
+		forrige = p
+	end
+	burst(pos + Vector3.new(0, 1, 0), Color3.fromRGB(200, 230, 255), 26, 30, 0.8, "rbxasset://textures/particles/sparkles_main.dds")
+	sjokkbolge(pos + Vector3.new(0, 0.3, 0), 22, Color3.fromRGB(200, 230, 255))
+	lyd(L.lyn, pos, 1, 1, 400)
+	task.delay(0.35, function()
+		lyd2D(L.torden, 0.5, 0.9 + math.random() * 0.2, 6)
+	end)
+	if blits then
+		blits.Brightness = 0.45
+		TweenService:Create(blits, TweenInfo.new(0.25), { Brightness = 0 }):Play()
+	end
+	local rot = spiller.Character and spiller.Character:FindFirstChild("HumanoidRootPart")
+	if rot and (rot.Position - pos).Magnitude < 40 then
+		Kamera.rist(0.6)
+	end
+end
+
+-- Meteoren: en ildkule som faller fra himmelen de siste sekundene før nedslaget.
+local function meteorFall(maal, treff)
+	local start = maal + Vector3.new(-120, 220, 80)
+	local kule = del({ Shape = Enum.PartType.Ball, Size = Vector3.one * 6, Position = start, Material = Enum.Material.Neon,
+		Color = Color3.fromRGB(255, 120, 30) })
+	local ild = Instance.new("Fire")
+	ild.Size = 18
+	ild.Heat = 25
+	ild.Color = Color3.fromRGB(255, 120, 30)
+	ild.SecondaryColor = Color3.fromRGB(255, 40, 10)
+	ild.Parent = kule
+	local a0 = Instance.new("Attachment", kule)
+	a0.Position = Vector3.new(0, 2.5, 0)
+	local a1 = Instance.new("Attachment", kule)
+	a1.Position = Vector3.new(0, -2.5, 0)
+	local tr = Instance.new("Trail")
+	tr.Attachment0, tr.Attachment1 = a0, a1
+	tr.Lifetime = 0.8
+	tr.LightEmission = 1
+	tr.Color = ColorSequence.new(Color3.fromRGB(255, 200, 80), Color3.fromRGB(255, 60, 20))
+	tr.Transparency = NumberSequence.new(0.1, 1)
+	tr.Parent = kule
+	local fallTid = 3
+	local forb
+	forb = RunService.RenderStepped:Connect(function()
+		local k = 1 - (treff - workspace:GetServerTimeNow()) / fallTid
+		if k >= 1 or not kule.Parent then
+			forb:Disconnect()
+			kule:Destroy()
+			return
+		end
+		kule.Position = start:Lerp(maal, math.clamp(k, 0, 1) ^ 1.6)
+	end)
+	lyd(L.ildkule, maal, 1, 0.9, 500)
+end
+
+local function meteorNedslag(pos)
+	lyd(L.smell, pos, 1.3, 0.9, 600)
+	lyd2D(L.torden, 0.4, 0.7, 6)
+	burst(pos + Vector3.new(0, 2, 0), Color3.fromRGB(255, 140, 40), 40, 45, 2.2, "rbxasset://textures/particles/fire_main.dds")
+	burst(pos + Vector3.new(0, 1, 0), Color3.fromRGB(120, 110, 100), 30, 30, 3)
+	sjokkbolge(pos + Vector3.new(0, 0.3, 0), 50, Color3.fromRGB(255, 160, 60))
+	local rot = spiller.Character and spiller.Character:FindFirstChild("HumanoidRootPart")
+	if rot then
+		local d = (rot.Position - pos).Magnitude
+		Kamera.rist(math.clamp(1.4 - d / 120, 0.2, 1.4))
+	end
+end
+
 -- Et gullegg har landet (Golden Egg Rain).
 function Effekter.landetEgg(pos)
 	burst(pos + Vector3.new(0, 1, 0), Color3.fromRGB(255, 215, 60), 20, 18, 0.7, "rbxasset://textures/particles/sparkles_main.dds")
@@ -529,7 +629,8 @@ local function serverHendelse(type_, a, b, c, d, e)
 		Debris:AddItem(kule, 0.9)
 	elseif type_ == "sjeldentEgg" then
 		local sj = Fugler.SJ[a]
-		HUD.banner(string.format("✨ A %s EGG is on the conveyor! ✨", string.upper(a)), sj and sj.farge, 4)
+		local ikon = a == "Spooky" and "🎃" or "✨"
+		HUD.banner(string.format("%s A %s EGG is on the conveyor! %s", ikon, string.upper(a), ikon), sj and sj.farge, 4)
 		lyd2D(L.forvandling, 0.6, 0.9, 3)
 	elseif type_ == "byttet" then
 		HUD.melding(string.format("%s and %s traded birds! 🤝", a.DisplayName, b.DisplayName), Color3.fromRGB(255, 230, 140))
@@ -545,6 +646,13 @@ local function serverHendelse(type_, a, b, c, d, e)
 			else
 				HUD.melding("The Golden Egg Rain is over", Color3.fromRGB(255, 225, 140))
 			end
+		elseif a == "Storm" then
+			if b then
+				HUD.banner("⛈️ STORM! Watch out for lightning! Thunderbirds earn x3! ⛈️", Color3.fromRGB(190, 215, 255), 5)
+				lyd2D(L.torden, 0.7, 0.8, 6)
+			else
+				HUD.melding("The storm is over 🌤️", Color3.fromRGB(200, 230, 255))
+			end
 		elseif a == "CosmicNight" then
 			if b then
 				HUD.banner("🌙✨ COSMIC NIGHT! Look for Secret eggs on the conveyor! ✨🌙", Color3.fromRGB(150, 230, 255), 5)
@@ -553,6 +661,17 @@ local function serverHendelse(type_, a, b, c, d, e)
 				HUD.melding("The sun rises. Cosmic Night is over ☀️", Color3.fromRGB(200, 220, 255))
 			end
 		end
+	elseif type_ == "lynVarsel" then
+		varselRing(a, b, Config.HENDELSER.LYN_RADIUS, Color3.fromRGB(190, 225, 255))
+	elseif type_ == "lynNedslag" then
+		lynNedslag(a)
+	elseif type_ == "meteorVarsel" then
+		varselRing(a, b, Config.HENDELSER.METEOR_RADIUS, Color3.fromRGB(255, 90, 40))
+		HUD.banner("☄️ METEOR INCOMING! Grab the Meteor Egg when it lands! ☄️", Color3.fromRGB(255, 140, 60), 4)
+		lyd2D(L.forvandling, 0.6, 0.6, 3)
+		task.delay(math.max(0, b - workspace:GetServerTimeNow() - 3), meteorFall, a, b)
+	elseif type_ == "meteorNedslag" then
+		meteorNedslag(a)
 	elseif type_ == "rebirth" then
 		-- a = spiller, b = antall rebirths
 		local rot = a and a.Character and a.Character:FindFirstChild("HumanoidRootPart")
@@ -677,6 +796,16 @@ function Effekter.start(grappler, kamera, remotes, hud, positurer)
 	vind:Play()
 	local bakgrunn = UI.ny("Sound", { SoundId = L.vindsus, Looped = true, Volume = 0.18 }, workspace.CurrentCamera)
 	bakgrunn:Play()
+	-- stormen: regn som følger kameraet, regnlyd og blits ved lynnedslag
+	blits = UI.ny("ColorCorrectionEffect", { Name = "LynBlits", Brightness = 0 }, game:GetService("Lighting"))
+	local regnSky = del({ Name = "RegnSky", Size = Vector3.new(140, 1, 140), Transparency = 1 })
+	local regn = UI.ny("ParticleEmitter", { Enabled = false, Rate = 500, Lifetime = NumberRange.new(0.8, 1),
+		Speed = NumberRange.new(90, 110), EmissionDirection = Enum.NormalId.Bottom, SpreadAngle = Vector2.new(3, 3),
+		Size = NumberSequence.new(0.1), Squash = NumberSequence.new(4), LightEmission = 0.2,
+		Transparency = NumberSequence.new(0.35), Color = ColorSequence.new(Color3.fromRGB(190, 210, 240)),
+		Orientation = Enum.ParticleOrientation.VelocityParallel }, regnSky)
+	local regnLyd = UI.ny("Sound", { SoundId = L.regn, Looped = true, Volume = 0 }, workspace.CurrentCamera)
+	regnLyd:Play()
 
 	local akk = 0
 	RunService.RenderStepped:Connect(function(dt)
@@ -691,6 +820,12 @@ function Effekter.start(grappler, kamera, remotes, hud, positurer)
 		vind.Volume += (vindMal - vind.Volume) * math.min(1, dt * 4)
 		vind.PlaybackSpeed = 0.8 + math.clamp(fart / 200, 0, 0.7)
 		oppdaterStreker(dt, fart)
+		local storm = workspace:GetAttribute("Hendelse") == "Storm"
+		regn.Enabled = storm
+		if storm then
+			regnSky.Position = workspace.CurrentCamera.CFrame.Position + Vector3.new(0, 45, 0)
+		end
+		regnLyd.Volume += ((storm and 0.5 or 0) - regnLyd.Volume) * math.min(1, dt * 2)
 		akk += dt
 		if akk > 0.25 then
 			akk = 0

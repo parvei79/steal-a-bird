@@ -113,6 +113,17 @@ local function knuff(figur, rot, offer, hastighet, angriper, grunn)
 	end
 end
 
+-- Slag fra omgivelsene (lyn, meteor): ragdoll, svimmel, og du mister det du bærer.
+function Kamp.slag(offer, hastighet, grunn)
+	local figur = offer.Character
+	local rot = figur and figur:FindFirstChild("HumanoidRootPart")
+	local hum = figur and figur:FindFirstChildOfClass("Humanoid")
+	if not rot or not hum or hum.Health <= 0 then
+		return
+	end
+	knuff(figur, rot, offer, hastighet, nil, grunn)
+end
+
 local function rykk(spiller, mal)
 	local figur = spiller.Character
 	local minRot = figur and figur:FindFirstChild("HumanoidRootPart")

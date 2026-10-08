@@ -247,8 +247,8 @@ local function lagIndex(skjerm)
 		local bilde = UI.ny("ViewportFrame", { Position = UDim2.fromOffset(6, 4), Size = UDim2.new(1, -12, 0, 96),
 			BackgroundTransparency = 1 }, k)
 		local navn = UI.tekst({ Position = UDim2.fromOffset(6, 100), Size = UDim2.new(1, -12, 0, 24), Text = "???" }, k)
-		local sjT = UI.tekst({ Position = UDim2.fromOffset(6, 124), Size = UDim2.new(1, -12, 0, 18), Text = a.sj,
-			TextColor3 = sj.farge }, k)
+		local sjT = UI.tekst({ Position = UDim2.fromOffset(6, 124), Size = UDim2.new(1, -12, 0, 18),
+			Text = a.sesong == "Halloween" and (a.sj .. " • 🎃 Halloween") or a.sj, TextColor3 = sj.farge }, k)
 		local mut = UI.tekst({ Position = UDim2.fromOffset(6, 142), Size = UDim2.new(1, -12, 0, 22), Text = "" }, k)
 		kort[a.id] = { navn = navn, sj = sjT, mut = mut, a = a, k = k, bilde = bilde }
 	end

@@ -238,6 +238,28 @@ local function reiret()
 		t.Parent = gui
 		gui.Parent = tavle
 	end
+	-- «Like»-skilt ved kanten av Reiret
+	local likePos = Vector3.new(R.x + math.cos(math.rad(112)) * 41, R.topp, R.z + math.sin(math.rad(112)) * 41)
+	local likeCf = CFrame.lookAt(likePos + Vector3.new(0, 6, 0), Vector3.new(R.x, R.topp + 6, R.z))
+	local like = del({ Name = "LikeSkilt", Size = Vector3.new(12, 6, 0.6), CFrame = likeCf,
+		Color = Color3.fromRGB(70, 150, 255) }, m)
+	del({ Name = "LikeStolpe", Size = Vector3.new(0.8, 3, 0.8), CFrame = CFrame.new(likePos + Vector3.new(0, 1.5, 0)),
+		Color = Color3.fromRGB(110, 78, 48) }, m)
+	do
+		local gui = Instance.new("SurfaceGui")
+		gui.Face = Enum.NormalId.Front
+		gui.LightInfluence = 0
+		local t = Instance.new("TextLabel")
+		t.Size = UDim2.fromScale(1, 1)
+		t.BackgroundTransparency = 1
+		t.Font = Enum.Font.FredokaOne
+		t.TextScaled = true
+		t.Text = "👍 LIKE + ⭐ FAVORITE\nfor NEW BIRDS every week!"
+		t.TextColor3 = Color3.new(1, 1, 1)
+		t.TextStrokeTransparency = 0.2
+		t.Parent = gui
+		gui.Parent = like
+	end
 	-- en reserve-startplass midt på Reiret (spillerne flyttes til basen sin med en gang)
 	del({ Klasse = "SpawnLocation", Name = "Start", Size = Vector3.new(6, 1, 6),
 		CFrame = CFrame.new(R.x + 20, R.topp + 0.5, R.z + 20), Transparency = 1, CanCollide = false, Neutral = true,

@@ -20,6 +20,7 @@ local rng = Random.new()
 Reiret.grunnFlaks = 1 -- 2 når noen har kjøpt Server Luck
 Reiret.flaks = 1      -- grunnFlaks, eller mer under Cosmic Night
 Reiret.kosmisk = nil  -- sjanse for Secret-egg (bare under Cosmic Night)
+Reiret.spooky = nil   -- sjanse for Spooky Egg (bare i Halloween-sesongen)
 
 local function naa()
 	return workspace:GetServerTimeNow()
@@ -48,6 +49,12 @@ function Reiret.nyttEgg(sj, art)
 	if not sj and Reiret.kosmisk and rng:NextNumber() < Reiret.kosmisk and #Fugler.tilgjengelige("Secret", tillat) > 0 then
 		sj = "Secret"
 	end
+	if not sj and Reiret.spooky and rng:NextNumber() < Reiret.spooky then
+		art = Fugler.trekkSesong(rng, "Halloween", tillat)
+		if art then
+			sj = "Spooky"
+		end
+	end
 	sj = sj or Fugler.trekkSjeldenhet(rng, Reiret.flaks, tillat)
 	art = art or Fugler.trekkArt(rng, sj, tillat)
 	if not art then
@@ -70,7 +77,7 @@ function Reiret.nyttEgg(sj, art)
 	m.Parent = mappe
 	e.modell = m
 	egg[e.id] = e
-	if Fugler.SJ[sj].nr >= 5 then
+	if Fugler.SJ[sj].nr >= 5 or sj == "Spooky" or sj == "Secret" then
 		Fjern.Hendelse:FireAllClients("sjeldentEgg", sj)
 	end
 	return e

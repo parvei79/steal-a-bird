@@ -247,6 +247,10 @@ local function steg(dt)
 	end
 
 	if res.v then
+		local vind = workspace:GetAttribute("Vind")
+		if typeof(vind) == "Vector3" then
+			res.v += vind * dt -- stormen: kroken må kompensere
+		end
 		rot.AssemblyLinearVelocity = res.v
 		local tilstand = hum:GetState()
 		if tilstand ~= Enum.HumanoidStateType.Freefall and tilstand ~= Enum.HumanoidStateType.Jumping then

@@ -87,6 +87,32 @@ local function pynt(st)
 			Lifetime = NumberRange.new(0.5, 1), Speed = NumberRange.new(0.3, 1), SpreadAngle = Vector2.new(180, 180),
 			LightEmission = 1, Size = NumberSequence.new(0.5, 0),
 			Color = ColorSequence.new(Color3.fromRGB(80, 230, 220), Color3.fromRGB(255, 220, 90)) })
+	elseif effekt == "gresskar" then
+		local lys = Instance.new("PointLight")
+		lys.Color = Color3.fromRGB(255, 160, 40)
+		lys.Range = 10
+		lys.Brightness = 1.8
+		lys.Parent = kropp
+	elseif effekt == "spokelys" then
+		local lys = Instance.new("PointLight")
+		lys.Color = Color3.fromRGB(120, 255, 140)
+		lys.Range = 10
+		lys.Brightness = 1.5
+		lys.Parent = kropp
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 4,
+			Lifetime = NumberRange.new(0.8, 1.4), Speed = NumberRange.new(0.3, 0.8), SpreadAngle = Vector2.new(180, 180),
+			LightEmission = 1, Size = NumberSequence.new(0.4, 0), Color = ColorSequence.new(Color3.fromRGB(140, 255, 160)) })
+	elseif effekt == "spokelse" then
+		-- spøkelset er halvt gjennomsiktig og glitrer svakt
+		for _, navn in { "Kropp", "VingeH", "VingeV" } do
+			local d = m:FindFirstChild(navn)
+			if d then
+				d.LocalTransparencyModifier = 0.35
+			end
+		end
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 6,
+			Lifetime = NumberRange.new(1, 1.8), Speed = NumberRange.new(0.2, 0.6), SpreadAngle = Vector2.new(180, 180),
+			LightEmission = 1, Size = NumberSequence.new(0.5, 0), Color = ColorSequence.new(Color3.fromRGB(220, 250, 255)) })
 	elseif effekt == "gull" then
 		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 9,
 			Lifetime = NumberRange.new(0.6, 1.2), Speed = NumberRange.new(0.5, 1.5), SpreadAngle = Vector2.new(180, 180),
@@ -188,9 +214,31 @@ local function registrer(m)
 	local art = Fugler.ART[m:GetAttribute("Art") or ""]
 	st.spredt = art and art.vinge == "spredt"
 	st.noter = art and art.effekt == "noter"
+	st.svever = art and art.effekt == "spokelse"
 	alle[m] = st
 	if st.erFugl then
 		task.defer(pynt, st)
+	elseif m:GetAttribute("Sj") == "Meteor" or m:GetAttribute("Sj") == "Spooky" then
+		local kropp = m:FindFirstChild("Kropp")
+		if kropp then
+			local meteor = m:GetAttribute("Sj") == "Meteor"
+			local lys = Instance.new("PointLight")
+			lys.Color = meteor and Color3.fromRGB(255, 110, 30) or Color3.fromRGB(255, 150, 40)
+			lys.Range = meteor and 18 or 10
+			lys.Brightness = meteor and 2.5 or 1.5
+			lys.Parent = kropp
+			if meteor then
+				partikler(kropp, { Texture = "rbxasset://textures/particles/fire_main.dds", Rate = 16,
+					Lifetime = NumberRange.new(0.4, 0.8), Speed = NumberRange.new(1.5, 3), SpreadAngle = Vector2.new(25, 25),
+					LightEmission = 1, Acceleration = Vector3.new(0, 4, 0),
+					Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.2), NumberSequenceKeypoint.new(1, 0) }),
+					Color = ColorSequence.new(Color3.fromRGB(255, 200, 80), Color3.fromRGB(255, 50, 20)) })
+				partikler(kropp, { Texture = "rbxasset://textures/particles/smoke_main.dds", Rate = 4,
+					Lifetime = NumberRange.new(1.5, 2.5), Speed = NumberRange.new(1, 2), SpreadAngle = Vector2.new(20, 20),
+					Transparency = NumberSequence.new(0.5, 1), Size = NumberSequence.new(1, 3),
+					Color = ColorSequence.new(Color3.fromRGB(70, 65, 60)) })
+			end
+		end
 	elseif m:GetAttribute("Sj") == "Golden" then
 		-- gulleggene lyser og glitrer, så de synes på avstand
 		local kropp = m:FindFirstChild("Kropp")
@@ -272,6 +320,9 @@ local function fugl(st, naa, servertid)
 		end
 		if st.hoppStart and naa - st.hoppStart < 0.38 then
 			hoppY = math.sin((naa - st.hoppStart) / 0.38 * math.pi) * 0.75
+		end
+		if st.svever then
+			bob = 0.35 + 0.3 * math.sin(t * 1.6)
 		end
 		kroppCF = CFrame.new(0, bob + hoppY, 0) * A(3 * math.sin(t * 1.1), st.kikk, 3 * math.sin(t * 0.7))
 		-- flaksing innimellom (3–4 slag), ellers rolig pust med vingene
@@ -383,7 +434,32 @@ local function egg(st, naa, servertid)
 	end
 end
 
+-- Flaggermus (Halloween) flyr i ring rundt et senter og flakser opp og ned.
+local flaggermus = {}
+local function flaggermusSteg(naa)
+	for f in flaggermus do
+		if not f.Parent then
+			flaggermus[f] = nil
+			continue
+		end
+		local senter = f:GetAttribute("Senter")
+		if typeof(senter) == "Vector3" then
+			local a = naa * (f:GetAttribute("Fart") or 0.4) + (f:GetAttribute("Fase") or 0)
+			local r = f:GetAttribute("Radius") or 20
+			local p = senter + Vector3.new(math.cos(a) * r, math.sin(naa * 3 + a) * 1.5, math.sin(a) * r)
+			local frem = Vector3.new(-math.sin(a), 0, math.cos(a)) * ((f:GetAttribute("Fart") or 1) > 0 and 1 or -1)
+			f.CFrame = CFrame.lookAt(p, p + frem) * A(0, 0, 25 * math.sin(naa * 14 + a))
+		end
+	end
+end
+
 function Fugleliv.start()
+	for _, f in CollectionService:GetTagged("Flaggermus") do
+		flaggermus[f] = true
+	end
+	CollectionService:GetInstanceAddedSignal("Flaggermus"):Connect(function(f)
+		flaggermus[f] = true
+	end)
 	for _, tag in { "Fugl", "Egg" } do
 		for _, m in CollectionService:GetTagged(tag) do
 			registrer(m)
@@ -393,6 +469,7 @@ function Fugleliv.start()
 	RunService.Stepped:Connect(function()
 		local naa = os.clock()
 		local servertid = workspace:GetServerTimeNow()
+		flaggermusSteg(naa)
 		local kamera = workspace.CurrentCamera.CFrame.Position
 		for m, st in alle do
 			local rot = m:FindFirstChild("Rot")

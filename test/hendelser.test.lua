@@ -9,8 +9,9 @@ local Config = krev("shared/Config")
 Mock.terrengHoyde = function(x, z)
 	return Kart.toppHoyde(x, z) or -1000
 end
--- et testprodukt (Server Luck) med ID, før serveren starter
+-- et testprodukt (Server Luck) med ID, og Halloween-sesongen, før serveren starter
 Config.ROBUX.PRODUKT[1].produktId = 4242
+Config.SESONG = "Halloween"
 
 local feil = 0
 local function sjekk(ok, tekst)
@@ -157,6 +158,85 @@ local svar3 = behandle({ PlayerId = 999, ProductId = 4242, PurchaseId = "kjop-2"
 sjekk(svar3 == Enum.ProductPurchaseDecision.NotProcessedYet, "kjøp fra en som ikke er her, venter")
 steg(Config.ROBUX.LUCK_TID + 2, 1)
 sjekk(Reiret.grunnFlaks == 1, "flaksen går over etter 15 minutter")
+
+-- ---------------------------------------------------------------- Storm
+local Kamp = krev("server/Kamp")
+Ting.lastInn(A, { { a = "Thunderbird", s = 2 } })
+steg(0.1)
+Hendelser.slutt() -- planen kan ha startet en hendelse mens testen spolte fram tiden
+local foerStorm = Ting.inntektFor(A)
+sjekk(Hendelser.start("Storm"), "Storm startet")
+steg(6, 1 / 10)
+sjekk(typeof(workspace:GetAttribute("Vind")) == "Vector3", "vinden blåser: " .. tostring(workspace:GetAttribute("Vind")))
+sjekk(Lighting.Brightness < 2, "det ble mørkt")
+local unDer = Ting.inntektFor(A)
+sjekk(unDer > foerStorm, string.format("Thunderbird tjener mer i stormen (%d -> %d)", foerStorm, unDer))
+local lyn = 0
+for _, h in Mock.hendelser do
+	if h.remote == "Hendelse" and h.args[1] == "lynNedslag" then
+		lyn += 1
+	end
+end
+sjekk(lyn >= 1, lyn .. " lynnedslag")
+-- et lyn rett ved en spiller slår ham over ende
+Kamp.slag(A, Vector3.new(40, 30, 0), "lyn")
+steg(0.1)
+sjekk((A.Character:GetAttribute("Ragdoll") or 0) > workspace:GetServerTimeNow(), "lynet slengte A som en filledukke")
+Hendelser.slutt()
+sjekk(workspace:GetAttribute("Vind") == nil and Lighting.ClockTime == klokke, "stormen er over, dagen er tilbake")
+sjekk(Ting.inntektFor(A) == foerStorm, "Thunderbird tjener vanlig igjen")
+steg(2)
+
+-- ---------------------------------------------------------------- Meteor Egg
+local B = Mock.leggTilSpiller("Sander", 1002)
+steg(0.5)
+Hendelser.slutt()
+sjekk(Hendelser.start("Meteor"), "Meteor startet")
+steg(0.2)
+local maal = workspace:GetAttribute("MeteorMaal")
+sjekk(typeof(maal) == "Vector3", "meteoren har et mål: " .. tostring(maal))
+flytt(B, maal + Vector3.new(2, 3, 0))
+steg(Config.HENDELSER.METEOR_VARSEL + 0.5, 1 / 10)
+local meteor
+for _, t in Ting.alle() do
+	if t.sj == "Meteor" then
+		meteor = t
+	end
+end
+sjekk(meteor ~= nil and meteor.tilstand == "sluppet", "meteoregget ligger ved nedslaget")
+sjekk(meteor and Fugler.SJ[Fugler.ART[meteor.art].sj].nr >= 4, "meteoregget har en Epic eller bedre: " .. tostring(meteor and meteor.art))
+sjekk((B.Character:GetAttribute("Ragdoll") or 0) > workspace:GetServerTimeNow(), "B stod for nær og ble slengt vekk")
+steg(2)
+flytt(B, meteor.modell.PrimaryPart.Position + Vector3.new(2, 3, 0))
+Handling.OnServerEvent:Fire(B, "ta", meteor.id)
+steg(0.1)
+sjekk(Ting.baeres(B) == meteor, "B tok meteoregget")
+local lagringB = Ting.fuglerFor(B)
+local harMeteor = false
+for _, f in lagringB do
+	if f.ek == "Meteor" then
+		harMeteor = true
+	end
+end
+sjekk(harMeteor, "meteoregget lagres som Meteor-egg")
+steg(Config.HENDELSER.METEOR_VARSEL + 3, 1 / 5)
+
+-- ---------------------------------------------------------------- Halloween
+sjekk(workspace:GetAttribute("Sesong") == "Halloween", "Halloween-sesongen er på")
+local harSesongfugler = Fugler.trekkSesong(Random.new(2), "Halloween", Reiret.tillat) ~= nil
+if harSesongfugler then
+	Reiret.spooky = 1
+	local e2 = Reiret.nyttEgg()
+	Reiret.spooky = Config.SPOOKY_SJANSE
+	sjekk(e2 and e2.sj == "Spooky" and Fugler.ART[e2.art].sesong == "Halloween", "Spooky Egg på båndet: " .. tostring(e2 and e2.art))
+else
+	print("  (Halloween-fuglene er ikke laget ennå — hopper over Spooky Egg)")
+end
+local Sesong = krev("server/Sesong")
+sjekk(Sesong.aktiv({ month = 10, day = 31 }) == "Halloween", "31. oktober er Halloween")
+Config.SESONG = "auto"
+sjekk(Sesong.aktiv({ month = 12, day = 1 }) == nil, "1. desember er ikke Halloween")
+sjekk(Sesong.aktiv({ month = 10, day = 1 }) == "Halloween", "1. oktober er Halloween (auto)")
 
 print(string.format("Simulerte %.0f s.", Mock.tid()))
 print((#Mock.feil == 0 and feil == 0) and "INGEN FEIL" or ("FEIL: " .. (#Mock.feil + feil)))

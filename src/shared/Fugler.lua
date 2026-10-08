@@ -23,6 +23,12 @@ end
 -- med ekstra flaks og minst Gold-mutasjon.
 Fugler.SJ.Golden = { id = "Golden", nr = 0, farge = Color3.fromRGB(255, 215, 60), vekt = 0, pris = 20000,
 	inntekt = { 0, 0 }, klekk = 20 }
+-- Meteor Egg (styrter ned under Meteor-hendelsen): Epic, Legendary eller Mythic.
+Fugler.SJ.Meteor = { id = "Meteor", nr = 0, farge = Color3.fromRGB(255, 120, 40), vekt = 0, pris = 2000000,
+	inntekt = { 0, 0 }, klekk = 45 }
+-- Spooky Egg (på båndet i oktober): klekker en Halloween-fugl.
+Fugler.SJ.Spooky = { id = "Spooky", nr = 0, farge = Color3.fromRGB(255, 140, 30), vekt = 0, pris = 150000,
+	inntekt = { 0, 0 }, klekk = 40 }
 
 -- ---------------------------------------------------------------- artene
 -- modell = navnet på 3D-modellen (fra Blender). vinge = "folda" (flakser ut fra siden) eller
@@ -75,6 +81,17 @@ Fugler.ARTER = {
 	-- Secret
 	{ id = "CosmicShoebill", navn = "Cosmic Shoebill", sj = "Secret", t = 0.0, effekt = "kosmos",
 		tekst = "Stared into the void. The void blinked." },
+	-- Halloween (bare fra Spooky Eggs i oktober). sesongVekt = sjansen i et Spooky Egg.
+	{ id = "PumpkinCrow", navn = "Pumpkin Crow", sj = "Rare", t = 0.6, sesong = "Halloween", sesongVekt = 40,
+		effekt = "gresskar", tekst = "Carved itself. Glows at night." },
+	{ id = "VampireFinch", navn = "Vampire Finch", sj = "Epic", t = 0.6, sesong = "Halloween", sesongVekt = 25,
+		tekst = "Real bird. Really drinks blood. Sleep tight." },
+	{ id = "WitchOwl", navn = "Witch Owl", sj = "Epic", t = 0.9, sesong = "Halloween", sesongVekt = 20,
+		tekst = "Hoo-hoo-hocus pocus." },
+	{ id = "SkeletonRaven", navn = "Skeleton Raven", sj = "Legendary", t = 0.7, sesong = "Halloween", sesongVekt = 12,
+		effekt = "spokelys", tekst = "Nevermore. Ever. More." },
+	{ id = "GhostDove", navn = "Ghost Dove", sj = "Mythic", t = 0.5, sesong = "Halloween", sesongVekt = 3,
+		effekt = "spokelse", tekst = "Boo-coo. Boo-coo." },
 }
 Fugler.ART = {}
 for i, a in Fugler.ARTER do
@@ -123,15 +140,45 @@ function Fugler.salgspris(art, mut, andel)
 	return math.floor(grunn * (andel or 0.5) * (m and m.faktor or 1))
 end
 
--- Arter som faktisk kan dukke opp (har en 3D-modell, eller `tillat` sier ja).
+-- Arter som faktisk kan dukke opp (har en 3D-modell, eller `tillat` sier ja). Sesongfugler er bare med i
+-- sine egne egg.
 function Fugler.tilgjengelige(sj, tillat)
 	local ut = {}
 	for _, a in Fugler.ARTER do
-		if a.sj == sj and (not tillat or tillat(a)) then
+		if a.sj == sj and not a.sesong and (not tillat or tillat(a)) then
 			table.insert(ut, a.id)
 		end
 	end
 	return ut
+end
+
+-- Trekk en sesongfugl (Spooky Egg) etter sesongVekt. nil hvis ingen er laget.
+function Fugler.trekkSesong(rng, sesong, tillat)
+	local liste, sum = {}, 0
+	for _, a in Fugler.ARTER do
+		if a.sesong == sesong and (not tillat or tillat(a)) then
+			sum += a.sesongVekt or 1
+			table.insert(liste, a)
+		end
+	end
+	if #liste == 0 then
+		return nil
+	end
+	local r = rng:NextNumber() * sum
+	for _, a in liste do
+		r -= a.sesongVekt or 1
+		if r <= 0 then
+			return a.id
+		end
+	end
+	return liste[#liste].id
+end
+
+-- Trekk arten i et Meteor Egg: Epic 50 %, Legendary 35 %, Mythic 15 %.
+function Fugler.trekkMeteor(rng, tillat)
+	local r = rng:NextNumber()
+	local sj = r < 0.15 and "Mythic" or (r < 0.5 and "Legendary" or "Epic")
+	return Fugler.trekkArt(rng, sj, tillat) or Fugler.trekkArt(rng, "Epic", tillat)
 end
 
 -- Trekk sjeldenhet for et nytt egg på båndet. flaks > 1 gjør de sjeldne mer sannsynlige.

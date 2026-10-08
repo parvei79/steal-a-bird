@@ -62,7 +62,11 @@ local hendelseTekst = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDi
 local luckTekst = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -14, 0, 40),
 	Size = UDim2.fromOffset(330, 24), Text = "", TextXAlignment = Enum.TextXAlignment.Right,
 	TextColor3 = Color3.fromRGB(120, 255, 140) }, skjerm)
-local HENDELSE_NAVN = { GoldenRain = "🥚 Golden Egg Rain", CosmicNight = "🌙 Cosmic Night" }
+local HENDELSE_NAVN = { GoldenRain = "🥚 Golden Egg Rain", CosmicNight = "🌙 Cosmic Night", Storm = "⛈️ Storm",
+	Meteor = "☄️ Meteor Egg" }
+local sesongTekst = UI.tekst({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -14, 0, 66),
+	Size = UDim2.fromOffset(330, 22), Text = "", TextXAlignment = Enum.TextXAlignment.Right,
+	TextColor3 = Color3.fromRGB(255, 150, 40) }, skjerm)
 local function klokke(sek)
 	sek = math.max(0, math.ceil(sek))
 	return string.format("%d:%02d", math.floor(sek / 60), sek % 60)
@@ -168,6 +172,7 @@ end
 local tyvPil = pil(Color3.fromRGB(255, 60, 60))
 local hjemPil = pil(Color3.fromRGB(90, 255, 120))
 local maalPil = pil(Color3.fromRGB(255, 220, 60))
+local meteorPil = pil(Color3.fromRGB(255, 110, 40))
 
 -- veiledning for nye spillere (øverst til venstre)
 local MAAL = {
@@ -279,6 +284,17 @@ local function oppdater(dt)
 			klokke((workspace:GetAttribute("NesteHendelseTid") or servertid) - servertid)) or ""
 		hendelseTekst.TextColor3 = Color3.fromRGB(255, 240, 200)
 	end
+	-- meteoren: nedtelling og pil mot nedslagsstedet
+	local meteorTid = workspace:GetAttribute("MeteorTid")
+	local meteorMaal = workspace:GetAttribute("MeteorMaal")
+	if meteorTid and meteorTid > servertid and typeof(meteorMaal) == "Vector3" then
+		hendelseTekst.Text = "☄️ METEOR LANDS IN " .. klokke(meteorTid - servertid)
+		hendelseTekst.TextColor3 = Color3.fromRGB(255, 140, 60)
+		pekPaa(meteorPil, meteorMaal)
+	else
+		meteorPil.Visible = false
+	end
+	sesongTekst.Text = workspace:GetAttribute("Sesong") == "Halloween" and "🎃 HALLOWEEN — Spooky Eggs on the conveyor!" or ""
 	local luck = workspace:GetAttribute("LuckTil")
 	luckTekst.Text = (luck and luck > servertid) and ("🍀 SERVER LUCK x2  " .. klokke(luck - servertid)) or ""
 	-- veiledning: mål og gul pil
