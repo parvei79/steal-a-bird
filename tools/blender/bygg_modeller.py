@@ -20,6 +20,12 @@ import rbxlib as R  # noqa: E402
 R.tom_scene()
 import fugler  # noqa: E402  (registrerer fargene)
 import rekvisitter  # noqa: E402
+try:
+    import rekvisitter_hendelser  # noqa: E402  (meteoregg, spooky-egg, gresskar ...)
+except ModuleNotFoundError as _feil:
+    if _feil.name != 'rekvisitter_hendelser':
+        raise
+    rekvisitter_hendelser = None
 
 ROT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -27,6 +33,8 @@ R.palett_materiale(lagre_png=os.path.join(ROT, 'assets', 'palett.png'))
 
 fugler.bygg()
 rekvisitter.bygg_alle()
+if rekvisitter_hendelser:
+    rekvisitter_hendelser.bygg_alle()
 
 R.skriv_modelinfo(os.path.join(ROT, 'src', 'shared', 'ModelInfo.lua'), 'tools/blender/bygg_modeller.py')
 R.eksporter_glb(os.path.join(ROT, 'assets', 'FuglModeller.glb'), 'FuglModeller')

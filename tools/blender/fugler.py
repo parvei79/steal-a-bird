@@ -300,7 +300,7 @@ FUGLER = {
 }
 
 # Fuglegruppene (laget i egne moduler) legges til automatisk hvis de finnes.
-for _modul in ('fugler_vanlige', 'fugler_sjeldne', 'fugler_legender'):
+for _modul in ('fugler_vanlige', 'fugler_sjeldne', 'fugler_legender', 'fugler_halloween'):
     try:
         _m = __import__(_modul)
     except ModuleNotFoundError as _feil:
