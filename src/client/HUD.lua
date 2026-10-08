@@ -192,7 +192,7 @@ local meteorPil = pil(Color3.fromRGB(255, 110, 40))
 
 -- veiledning for nye spillere (øverst til venstre)
 local MAAL = {
-	"🥚 Buy an egg at the Nest in the middle",
+	"🥚 Swing to the Nest (hold left mouse) and buy an egg",
 	"🏠 Carry the egg home to your base",
 	"💰 Stand on COLLECT to get your cash",
 	"😈 Steal a bird from another base (hold E)!",
@@ -429,26 +429,10 @@ function HUD.start(grappler, kamera, remotes)
 		end
 	end)
 
-	-- musikk og fuglesang (🔊-knappen nede til venstre skrur musikken av og på)
-	local musikk = UI.ny("Sound", { Volume = 0.18 }, workspace.CurrentCamera)
-	local paa = true
-	local lydKnapp
-	lydKnapp = UI.knapp({ AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 12, 1, -12), Size = UDim2.fromOffset(56, 48),
-		Text = "🔊", BackgroundColor3 = UI.FARGER.panel2 }, skjerm, function()
-		paa = not paa
-		musikk.Volume = paa and 0.18 or 0
-		lydKnapp.Text = paa and "🔊" or "🔇"
-	end)
-	local n = 0
-	local function neste()
-		n = n % #Config.MUSIKK + 1
-		musikk.SoundId = Config.MUSIKK[n]
-		musikk.TimePosition = 0
-		musikk:Play()
-	end
-	musikk.Ended:Connect(neste)
-	neste()
-	local sang = UI.ny("Sound", { SoundId = Config.LYD.fuglesang, Looped = true, Volume = 0.22 }, workspace.CurrentCamera)
+	-- ingen musikk, bare lyden av øyene: fuglesang, eller skummel vind i Halloween-sesongen
+	local halloween = workspace:GetAttribute("Sesong") == "Halloween"
+	local sang = UI.ny("Sound", { SoundId = halloween and Config.LYD.spokevind or Config.LYD.fuglesang, Looped = true,
+		Volume = halloween and 0.35 or 0.22 }, workspace.CurrentCamera)
 	sang:Play()
 end
 

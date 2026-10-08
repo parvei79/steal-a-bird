@@ -41,6 +41,18 @@ Config.BAER = {
 	TA_AVSTAND = 14,         -- hvor nær du må være for å kjøpe, stjele eller snappe (studs)
 	SLUPPET_TID = 8,         -- så lenge et mistet egg svever før det flyr hjem
 	STJEL_HOLD = 0.6,        -- sekunder du må holde E for å stjele
+	-- Hvor tungt det er å bære (0–1): jo sjeldnere, jo kortere når kroken, jo tregere trekkes du inn og
+	-- jo saktere går du. Kroken: rekkevidde x (1 - 0.7·vekt), inntrekk x (1 - vekt).
+	VEKT = { Common = 0.05, Uncommon = 0.1, Rare = 0.2, Epic = 0.3, Legendary = 0.4, Mythic = 0.5, Secret = 0.6,
+		Golden = 0.25, Spooky = 0.3, Meteor = 0.45 },
+}
+
+-- Kast opp på kanten: når tauet har dratt deg helt inn mot siden eller undersiden av en øy, blir du kastet i en
+-- bue opp og inn på toppen (så du ikke blir hengende under øya).
+Config.KANTKAST = {
+	AVSTAND = 18,            -- så nær festet du må være
+	OVER = 7,                -- toppen av buen er så høyt over øya
+	INN = 4,                 -- du lander så langt inn fra kanten
 }
 
 Config.BASE = {
@@ -176,6 +188,7 @@ Config.LYD = {
 	ildkule = id(9114428537),     -- Fireball 1 (meteoren faller)
 	smell = id(9117876706),       -- Power Explosions Big Heavy Searing Boom 2 (nedslaget)
 	spokelse = id(9119464660),    -- Spirit Fly Bys Spooky Windy Airy Pass Bys 7
+	spokevind = id(9114625745),   -- Gods Wind Spooky Eerie 2 (bakgrunn i Halloween-sesongen)
 }
 Config.MUSIKK = {
 	id(1839885740), -- Flying So High (APM)

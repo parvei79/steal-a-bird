@@ -851,6 +851,7 @@ function metoder.GetService(_, navn)
 end
 game = spill
 workspace = tjeneste("Workspace")
+workspace.Gravity = 196.2
 local terreng = ny("Terrain", workspace)
 terreng.Name = "Terrain"
 Mock.voksler = 0

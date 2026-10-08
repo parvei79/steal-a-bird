@@ -24,7 +24,7 @@
 
 - **Reiret:** en stor blokk-øy i midten med et kjempereir og eggebåndet rundt.
 - **8 baser:** svevende blokk-øyer i en ring rundt reiret, ca. 165 studs fra midten. Hver base har:
-  - hengebro inn til Reiret
+  - ingen broer — man må svinge seg over (trappesteiner på veien, og «kast opp på kanten»)
   - 16 sokler (6 åpne fra start)
   - LOCK-knapp, COLLECT-plate og et skilt med navnet ditt
 - **Svevesteiner** mellom øyene til å svinge seg i, og skyhav under.
@@ -167,5 +167,6 @@ Senere kommer **Rebirth**: du starter på nytt og får mer inntekt for alltid.
 
 - **Tapt lagring er det verste.** Vi bruker session lock, prøver på nytt ved feil og tester med falsk DataStore.
 - **Juksing:** serveren sjekker avstand, pris, eierskap og tidtakere.
-- **Kroken kan være vanskelig for nybegynnere.** Hengebroene gjør at alle kan gå.
+- **Kroken kan være vanskelig for nybegynnere.** Trappesteiner på veien, kast opp på kanten når tauet er dratt
+  helt inn, og veiledningen viser vei. Jo sjeldnere egg/fugl du bærer, jo tyngre (kortere tau, tregere inntrekk).
 - **Vi trenger mange fugler.** Fuglebyggeren `tools/blender/fugler.py` gjør at en ny fugl tar ca. 20 linjer kode.

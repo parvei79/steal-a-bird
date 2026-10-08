@@ -33,6 +33,11 @@ for i = 1, Kart.ANTALL_BASER do
 	table.insert(Kart.STEINER, { x = math.cos(a) * 178, z = math.sin(a) * 178, topp = 70 + (i % 2) * 8, r = 7,
 		dybde = 12, fro = 40 + i })
 end
+-- Trappesteiner (det er ingen broer): én høy stein midt på linjen mellom hver base og Reiret.
+for i = 1, Kart.ANTALL_BASER do
+	local a = (i - 1) / Kart.ANTALL_BASER * 2 * math.pi
+	table.insert(Kart.STEINER, { x = math.cos(a) * 92, z = math.sin(a) * 92, topp = 58, r = 6, dybde = 10, fro = 60 + i })
+end
 for i = 1, 4 do
 	local a = (i - 1) / 4 * 2 * math.pi + math.pi / 4
 	table.insert(Kart.STEINER, { x = math.cos(a) * 58, z = math.sin(a) * 58, topp = 96, r = 5, dybde = 8, fro = 50 + i })

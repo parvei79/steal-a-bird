@@ -262,6 +262,57 @@ sjekk(salto, "salto/skru i lufta")
 Mock.fysiske = function()
 	return {}
 end
+-- kast opp på kanten: heng mot siden av en base-øy, bli dratt inn og kastet opp på toppen
+do
+	local b = Kart.BASER[i]
+	Mock.fysiske = function()
+		return { rot }
+	end
+	figur:PivotTo(CFrame.new(Kart.lokal(i, 0, -(b.r + 22), -8)))
+	rot.AssemblyLinearVelocity = Vector3.zero
+	local side = Kart.lokal(i, 0, -(b.r - 1), -3)
+	for _ = 1, 12 do
+		bakke()
+		Kamera.settRetning((side - workspace.CurrentCamera.CFrame.Position).Unit)
+		Mock.steg(1 / 60)
+	end
+	local kastet = false
+	local forrige = Grappler.hendelser
+	Grappler.hendelser = function(liste)
+		for _, h in liste do
+			if h[1] == "salto" then
+				kastet = true
+			end
+		end
+		forrige(liste)
+	end
+	Grappler.skyt()
+	local paaToppen = false
+	for _ = 1, 300 do
+		bakke()
+		Mock.steg(1 / 60)
+		local p = rot.Position
+		if Kart.iBase(i, p) and p.Y > b.topp + 1 and p.Y < b.topp + 5 and rot.AssemblyLinearVelocity.Y <= 0
+			and Vector3.new(p.X - b.x, 0, p.Z - b.z).Magnitude < b.r then
+			paaToppen = true
+			break
+		end
+	end
+	Grappler.hendelser = forrige
+	sjekk(kastet and paaToppen, "kastet opp på kanten av øya (" .. tostring(rot.Position) .. ")")
+	-- land ordentlig før resten av testen
+	for _ = 1, 120 do
+		bakke()
+		Mock.steg(1 / 60)
+		if Grappler.tilstand().bevegelse == "bakke" then
+			break
+		end
+	end
+	rot.AssemblyLinearVelocity = Vector3.zero
+	Mock.fysiske = function()
+		return {}
+	end
+end
 -- superhelt-landing direkte (styrke 1)
 Positurer.landing(figur, 1)
 for _ = 1, 10 do

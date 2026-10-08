@@ -45,18 +45,6 @@ for i = 1, Kart.ANTALL_BASER do
 		data({ k = navn, x = cf.Position.X, z = cf.Position.Z })
 	end
 	paaBakken(Kart.spawn(i).Position, "base " .. i .. " spawn")
-	local fra, til = Kart.bro(i)
-	paaBakken(fra - (til - fra).Unit * 2, "base " .. i .. " broende")
-	paaBakken(til + (til - fra).Unit * 2, "reir-enden av bro " .. i)
-	data({ k = "bro", ax = fra.X, az = fra.Z, bx = til.X, bz = til.Z })
-	-- ingen svevestein over broen (kroken skal kunne treffe dem, men de skal ikke sperre veien)
-	for _, s in Kart.STEINER do
-		local p = Vector3.new(s.x, 0, s.z)
-		local a, b = Vector3.new(fra.X, 0, fra.Z), Vector3.new(til.X, 0, til.Z)
-		local t = math.clamp((p - a):Dot(b - a) / (b - a):Dot(b - a), 0, 1)
-		local naermest = a + (b - a) * t
-		sjekk((p - naermest).Magnitude > s.r + 6 or s.topp > Kart.HOYDE + 15, "svevestein sperrer bro " .. i)
-	end
 end
 -- eggebåndet ligger på Reiret
 for n = 0, 31 do

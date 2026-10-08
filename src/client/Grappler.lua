@@ -11,13 +11,15 @@ local ContextActionService = game:GetService("ContextActionService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local Krok = require(Shared:WaitForChild("Krok"))
+local Kart = require(Shared:WaitForChild("Kart"))
 
 local Grappler = {}
 
 local spiller = Players.LocalPlayer
 local remotes = ReplicatedStorage:WaitForChild("Remotes")
 local kamera = workspace.CurrentCamera
-local K, KAMP, BAER = Config.KROK, Config.KAMP, Config.BAER
+local K, KAMP = Config.KROK, Config.KAMP
+local oyVed, kantkast
 
 local s = Krok.ny()
 local figur, hum, rot
@@ -42,8 +44,9 @@ local function oppdaterEvner()
 	local tau = Config.OPPGRADERINGER[1].verdier[math.min(o.tau or 0, 5) + 1]
 	local trekk = Config.OPPGRADERINGER[2].verdier[math.min(o.trekk or 0, 5) + 1]
 	local baerer = figur and figur:GetAttribute("Baerer") ~= nil
-	s.rekkevidde = tau * (baerer and BAER.TAU or 1)
-	s.trekkFaktor = trekk * (baerer and 0.85 or 1)
+	local vekt = baerer and (figur:GetAttribute("BaererVekt") or 0.2) or 0
+	s.rekkevidde = tau * (1 - 0.7 * vekt)
+	s.trekkFaktor = trekk * (1 - vekt)
 end
 Grappler.oppdaterEvner = oppdaterEvner
 
@@ -199,6 +202,33 @@ end
 
 -- ---------------------------------------------------------------- fysikksteg
 
+-- Øya festet sitter i (siden eller undersiden), eller nil.
+oyVed = function(p)
+	for _, oy in Kart.alleOyer() do
+		local dx, dz = p.X - oy.x, p.Z - oy.z
+		if dx * dx + dz * dz <= (oy.r + 4) ^ 2 and p.Y <= oy.topp + 1 and p.Y >= oy.topp - oy.dybde - 16 then
+			return oy
+		end
+	end
+	return nil
+end
+
+-- Farten som kaster deg i en bue fra pos opp og inn på toppen av øya (nærmeste kant).
+kantkast = function(oy, pos)
+	local K = Config.KANTKAST
+	local senter = Vector3.new(oy.x, 0, oy.z)
+	local ut = Vector3.new(pos.X, 0, pos.Z) - senter
+	ut = ut.Magnitude > 0.5 and ut.Unit or Vector3.new(1, 0, 0)
+	local inn = math.max(oy.r - K.INN, oy.r * 0.4)
+	local maal = Vector3.new(oy.x, oy.topp + 3, oy.z) + ut * inn
+	local g = workspace.Gravity
+	local topp = math.max(maal.Y, pos.Y) + K.OVER
+	local vy = math.sqrt(2 * g * (topp - pos.Y))
+	local tid = vy / g + math.sqrt(2 * (topp - maal.Y) / g)
+	local flat = Vector3.new(maal.X - pos.X, 0, maal.Z - pos.Z)
+	return flat / tid + Vector3.new(0, vy, 0)
+end
+
 local function steg(dt)
 	if not figur or not rot or not rot.Parent or not hum or hum.Health <= 0 then
 		return
@@ -243,6 +273,20 @@ local function steg(dt)
 			end
 		elseif Grappler.hendelser then
 			Grappler.hendelser({ h })
+		end
+	end
+
+	-- kast opp på kanten når du er dratt helt inn mot en øy
+	if res.v and s.krok == "fest" and s.bevegelse == "hekta" and not maalModell and s.anker then
+		local oy = oyVed(s.anker)
+		if oy and rot.Position.Y < oy.topp + 1 and (s.anker - rot.Position).Magnitude < Config.KANTKAST.AVSTAND then
+			local v = kantkast(oy, rot.Position)
+			Grappler.slipp()
+			s.slippBoost = false
+			s.settFart = v
+			res.v = v
+			hendelse("salto", "salto")
+			remotes.Handling:FireServer("triks", "salto")
 		end
 	end
 

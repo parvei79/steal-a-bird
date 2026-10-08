@@ -4,9 +4,10 @@ Sving deg mellom svevende øyer med gripekrok, kjøp rare egg, klekk sjeldne fug
 fuglene fra de andres baser! Rykk tyvene ned fra himmelen før de stikker av med din Phoenix.
 
 - **Reiret i midten:** egg ruller rundt på et transportbånd. Kjøp med E og bær egget hjem over hodet.
-- **8 baser** på svevende blokk-øyer med hengebroer inn til Reiret. Eggene klekkes på soklene og blir fugler
+- **8 baser** på svevende blokk-øyer. Ingen broer: du må svinge deg over med kroken (trappesteiner hjelper, og
+  når tauet drar deg helt inn mot en øy, blir du kastet opp på kanten). Eggene klekkes på soklene og blir fugler
   som tjener penger hvert sekund. Hent pengene på COLLECT-platen.
-- **Stjel:** hold E på en fugl i en annen base og løp hjem med den. Eieren får alarm og kan rykke deg med kroken.
+- **Stjel:** hold E på en fugl i en annen base og sving deg hjem med den — jo sjeldnere, jo tyngre å bære. Eieren får alarm og kan rykke deg med kroken.
   Da ragdoller du, blir svimmel, og fuglen flyr hjem igjen.
 - **LOCK-knappen** gir et skjold over basen en stund. Nye spillere har 3 minutter nybegynnerskjold.
 - **31 fugler** i 7 sjeldenheter (Common → Secret) + 5 Halloween-fugler (36 i alt), med mutasjoner (Gold,

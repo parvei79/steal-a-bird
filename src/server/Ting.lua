@@ -208,10 +208,12 @@ local function baer(t, spiller)
 	end
 	local f = spiller.Character
 	local hum = f and f:FindFirstChildOfClass("Humanoid")
+	local vekt = Config.BAER.VEKT[t.sj] or 0.2
 	if hum then
-		hum.WalkSpeed = 16 * Spillere.verdi(spiller, "baer")
+		hum.WalkSpeed = 16 * math.max(0.3, Spillere.verdi(spiller, "baer") - vekt * 0.5)
 	end
 	if f then
+		f:SetAttribute("BaererVekt", vekt)
 		f:SetAttribute("Baerer", t.id)
 		f:SetAttribute("BaererTid", naa())
 		f:SetAttribute("Tyv", t.fra ~= nil)

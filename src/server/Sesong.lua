@@ -58,6 +58,29 @@ function Sesong.init(Modeller, Verden, Reiret)
 	if Fugler.trekkSesong(Random.new(1), "Halloween", Reiret.tillat) then
 		Reiret.spooky = Config.SPOOKY_SJANSE
 	end
+	-- skumring: oransje-lilla himmel, lilla tåke, mørkere skygger (hendelsene tar vare på dette og setter det tilbake)
+	local Lighting = game:GetService("Lighting")
+	Lighting.ClockTime = 18.3
+	Lighting.Brightness = 1.7
+	Lighting.Ambient = Color3.fromRGB(80, 60, 100)
+	Lighting.OutdoorAmbient = Color3.fromRGB(120, 90, 140)
+	local atm = Lighting:FindFirstChildOfClass("Atmosphere")
+	if atm then
+		atm.Color = Color3.fromRGB(150, 95, 170)
+		atm.Decay = Color3.fromRGB(90, 40, 110)
+		atm.Density = 0.38
+		atm.Haze = 1.6
+	end
+	local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect")
+	if cc then
+		cc.TintColor = Color3.fromRGB(255, 220, 235)
+		cc.Saturation = 0.1
+		cc.Contrast = 0.15
+	end
+	local skyer = workspace.Terrain:FindFirstChildOfClass("Clouds")
+	if skyer then
+		skyer.Color = Color3.fromRGB(120, 100, 140)
+	end
 	local mappe = Instance.new("Folder")
 	mappe.Name = "Halloween"
 	mappe.Parent = Verden.mappe
@@ -80,8 +103,13 @@ function Sesong.init(Modeller, Verden, Reiret)
 			gresskar(Modeller, Verden, Kart.baseCF(i) * CFrame.new(side * 7, 0, 24), 1.1, mappe)
 		end
 	end
+	-- gresskar på svevesteinene
+	for _, st in Kart.STEINER do
+		gresskar(Modeller, Verden, CFrame.new(st.x + 1.5, st.topp, st.z) * CFrame.Angles(0, rng:NextNumber(0, 6.28), 0),
+			rng:NextNumber(0.8, 1.2), mappe)
+	end
 	-- flaggermus som flyr i ring over Reiret (klienten flytter dem)
-	for n = 1, 10 do
+	for n = 1, 18 do
 		local senter = Vector3.new(R.x, R.topp + rng:NextNumber(20, 40), R.z)
 		local radius = rng:NextNumber(14, 40)
 		local f = Modeller.plasser("Flaggermus", CFrame.new(senter + Vector3.new(radius, 0, 0)), rng:NextNumber(1, 1.6), mappe)

@@ -268,7 +268,7 @@ end
 
 -- ---------------------------------------------------------------- hengebroer
 
-local function bro(a, b, farge)
+local function _bro(a, b, farge) -- ikke i bruk: spillet har ingen broer (du må svinge deg over)
 	local lengde = (b - a).Magnitude
 	local frem = (b - a).Unit
 	local hoyre = frem:Cross(Vector3.new(0, 1, 0)).Unit
@@ -391,8 +391,6 @@ function Verden.bygg(modeller)
 		m.Name = "BaseOy" .. i
 		m.Parent = mappe
 		Verden.oy(b, m, Verden.BASEFARGER[i])
-		local fra, til = Kart.bro(i)
-		bro(fra + Vector3.new(0, 0.3, 0), til + Vector3.new(0, 0.3, 0), Verden.BASEFARGER[i])
 		task.wait()
 	end
 	local steiner = Instance.new("Model")
