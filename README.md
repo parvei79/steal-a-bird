@@ -39,8 +39,9 @@ python3 tools/test_luau.py test/klient.test.lua --mock
 python3 tools/bygg_place.py
 ```
 
-Åpne `build/StealABird.rbxlx` i Studio (Cmd+O). Første gang: **Import 3D** → `assets/FuglModeller.glb` →
-**Import** → Cmd+S. Trykk **Play**. Uten import virker spillet med enkle kloss-fugler.
+Åpne `build/StealABird.rbxlx` i Studio (Cmd+O). Første gang, og hver gang modellene er endret: **Import 3D** →
+`assets/FuglModeller.glb` → **Import** → **Play** (den nye importen erstatter den gamle) → Cmd+S.
+Uten import virker spillet med enkle kloss-fugler.
 
 ## Styring
 
@@ -74,7 +75,9 @@ Ikon og bilde til spillsiden: `assets/ikon.png` og `assets/thumbnail.png` (lages
 python3 tools/test_luau.py test/kart.test.lua --data /tmp/kart.json && python3 tools/vis_kart.py /tmp/kart.json -o assets/previews/_kart.png
 python3 tools/test_luau.py test/server.test.lua --mock   # kjøp, klekk, penger, stjel, rykk, lås, salg, bytte, lagring
 python3 tools/test_luau.py test/klient.test.lua --mock   # hele spillet med den ekte klientkoden og animasjonene
-python3 tools/test_luau.py test/hendelser.test.lua --mock # gullregn, Cosmic Night, rebirth og Robux-kjøp
+python3 tools/test_luau.py test/hendelser.test.lua --mock # gullregn, storm, Cosmic Night, meteor, Halloween, rebirth, Robux
+python3 tools/test_luau.py test/modeller.test.lua --mock  # alle 36 fuglene satt sammen av «importerte» modeller
+python3 tools/test_luau.py test/reimport.test.lua --mock  # ny import erstatter den gamle
 ```
 
 Juster følelsen og økonomien i `src/shared/Config.lua` og `src/shared/Fugler.lua`, og kartet i `src/shared/Kart.lua`.

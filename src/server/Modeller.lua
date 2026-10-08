@@ -25,27 +25,48 @@ local function erModellmappe(m)
 	return false
 end
 
+-- Finn modellmappa. En NY import ligger i workspace (Import 3D legger den der): da brukes den, og en gammel
+-- mappe i ServerStorage fjernes. Så holder det å importere på nytt og trykke Play/lagre.
 function Modeller.init()
-	mappe = ServerStorage:FindFirstChild(MAPPENAVN) or workspace:FindFirstChild(MAPPENAVN)
-	if not mappe then
-		for _, beholder in { ServerStorage, workspace } do
-			for _, m in beholder:GetChildren() do
-				if erModellmappe(m) then
-					mappe = m
-					break
-				end
-			end
-			if mappe then
+	local ny = nil
+	for _, m in workspace:GetChildren() do
+		if (m.Name == MAPPENAVN or m.Name == "Scene") and erModellmappe(m) then
+			ny = m
+			break
+		end
+	end
+	local gammel = ServerStorage:FindFirstChild(MAPPENAVN)
+	if not gammel then
+		for _, m in ServerStorage:GetChildren() do
+			if erModellmappe(m) then
+				gammel = m
 				break
 			end
 		end
 	end
+	if ny and gammel and ny ~= gammel then
+		gammel:Destroy()
+		print("[STEAL A BIRD] Ny import funnet i Workspace — den gamle FuglModeller i ServerStorage er byttet ut.")
+	end
+	mappe = ny or gammel
 	if mappe then
 		mappe.Name = MAPPENAVN
-		if mappe.Parent == workspace then
-			mappe.Parent = ServerStorage
+		mappe.Parent = ServerStorage
+		-- tell hvor mange av modellene i ModelInfo som finnes (gammel import = mangler nye modeller)
+		local mangler = {}
+		for navn in ModelInfo do
+			local d = mappe:FindFirstChild(navn, true)
+			if not d then
+				table.insert(mangler, navn)
+			end
 		end
-		print("[STEAL A BIRD] Fant 3D-modellene fra Blender.")
+		if #mangler > 0 then
+			table.sort(mangler)
+			warn(string.format("[STEAL A BIRD] FuglModeller mangler %d modeller (f.eks. %s). Importer assets/FuglModeller.glb "
+				.. "på nytt med Import 3D, trykk Play og lagre (Cmd+S).", #mangler, table.concat(mangler, ", ", 1, math.min(4, #mangler))))
+		else
+			print("[STEAL A BIRD] Fant alle de 3D-modellene fra Blender.")
+		end
 	else
 		warn("[STEAL A BIRD] Fant ikke «" .. MAPPENAVN .. "». Bruker reserve-modeller av klosser. "
 			.. "Importer assets/FuglModeller.glb med Import 3D i Studio for de ekte modellene.")

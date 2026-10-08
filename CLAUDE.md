@@ -7,7 +7,8 @@ og `PLAN.md` før du endrer noe.
 ## Før du sier «ferdig»
 1. `tools/sjekk.sh`
 2. `python3 tools/test_luau.py test/server.test.lua --mock`, `test/klient.test.lua --mock`,
-   `test/hendelser.test.lua --mock` og `test/modeller.test.lua --mock` (falske importerte modeller) — «INGEN FEIL».
+   `test/hendelser.test.lua --mock`, `test/modeller.test.lua --mock` (falske importerte modeller) og
+   `test/reimport.test.lua --mock` — «INGEN FEIL».
 3. Endret kartet? `test/kart.test.lua` + `tools/vis_kart.py`, og se på bildet.
 4. Endret modeller/fugler? Bygg i Blender og SE på `assets/previews/_fugler.png` og `_ark.png`.
 Etterligningen har ingen ekte fysikk eller grafikk — animasjonene må Pål se i Studio.
@@ -35,6 +36,7 @@ Etterligningen har ingen ekte fysikk eller grafikk — animasjonene må Pål se 
   Ikon og bilde til spillsiden: `ikon.py`.
 
 ## Det Pål må gjøre selv
-Import av `assets/FuglModeller.glb` (én gang per modellsett), Play, publisering, og i Game Settings:
+Import av `assets/FuglModeller.glb` når modellene er endret (en ny import i Workspace erstatter den gamle i
+ServerStorage når han trykker Play; så Cmd+S), Play, publisering (`docs/PUBLISERING.md`), og i Game Settings:
 Avatar = R15, maks 8 spillere, «Enable Studio Access to API Services» (lagring). Etter en ny bygging:
 lukk fanen i Studio UTEN å lagre og åpne `build/StealABird.rbxlx` på nytt.
