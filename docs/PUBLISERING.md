@@ -18,8 +18,15 @@ publisert**. Følg stegene i rekkefølge. Alt som står i «sitat» kan kopieres
 - **Permissions:** la spillet være **Private** til dere har testet med venner. Gjør det **Public** til slutt.
 
 ## 3. Test med venner (før det blir offentlig)
-- Private spill kan bare spilles av deg og folk du gir tilgang: **create.roblox.com → spillet → Collaborators**
-  (gi Sander/venner «Play»-tilgang), eller gjør det Friends-only.
+- Sett **Playability** til **Friends** (Game Settings → Permissions, eller create.roblox.com → spillet →
+  Settings). Da kan alle som er venner med kontoen som eier spillet, bli med. Collaborators gir redigeringstilgang,
+  ikke bare spilletilgang, så bruk det ikke til venner.
+- Fyll ut **Experience Questionnaire** (punkt 5) før dere inviterer andre, ellers kan noen bli stoppet av
+  aldersgrensene.
+- Venner finner spillet på profilen din under **Creations**, eller du deler lenken (create.roblox.com → spillet →
+  View on Roblox).
+- **Oppdatere senere:** når Claude har bygget en ny `StealABird.rbxlx`, åpner du den og velger **File → Publish to
+  Roblox As… → det eksisterende spillet** (ikke *Create new*), så **Overwrite**. Ellers får du to spill.
 - Test sammen: stjele fra hverandre, rykke tyver med kroken, låse basen, bytte fugler (TRADE), og vent på en
   hendelse (Golden Egg Rain etter 6 min, Storm etter 10, Cosmic Night etter 15, Meteor etter 20).
 - I Studio kan dere også teste flere spillere alene: **Test → Clients and Servers → 2 spillere → Start**.
