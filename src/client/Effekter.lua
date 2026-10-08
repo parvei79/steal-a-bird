@@ -629,8 +629,12 @@ local function serverHendelse(type_, a, b, c, d, e)
 		Debris:AddItem(kule, 0.9)
 	elseif type_ == "sjeldentEgg" then
 		local sj = Fugler.SJ[a]
-		local ikon = a == "Spooky" and "🎃" or "✨"
-		HUD.banner(string.format("%s A %s EGG is on the conveyor! %s", ikon, string.upper(a), ikon), sj and sj.farge, 4)
+		if a == "Spooky" then
+			-- Spooky Eggs kommer ganske ofte i oktober: en liten melding, ikke et stort banner
+			HUD.melding("🎃 A Spooky Egg is on the conveyor!", sj and sj.farge, 4)
+			return
+		end
+		HUD.banner(string.format("✨ A %s EGG is on the conveyor! ✨", string.upper(tostring(a))), sj and sj.farge, 4)
 		lyd2D(L.forvandling, 0.6, 0.9, 3)
 	elseif type_ == "byttet" then
 		HUD.melding(string.format("%s and %s traded birds! 🤝", a.DisplayName, b.DisplayName), Color3.fromRGB(255, 230, 140))

@@ -113,6 +113,11 @@ local function pynt(st)
 		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 6,
 			Lifetime = NumberRange.new(1, 1.8), Speed = NumberRange.new(0.2, 0.6), SpreadAngle = Vector2.new(180, 180),
 			LightEmission = 1, Size = NumberSequence.new(0.5, 0), Color = ColorSequence.new(Color3.fromRGB(220, 250, 255)) })
+	elseif effekt == "magi" then
+		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 7,
+			Lifetime = NumberRange.new(0.6, 1.2), Speed = NumberRange.new(0.4, 1.2), SpreadAngle = Vector2.new(180, 180),
+			LightEmission = 1, Size = NumberSequence.new(0.5, 0),
+			Color = ColorSequence.new(Color3.fromRGB(180, 110, 255), Color3.fromRGB(120, 255, 140)) })
 	elseif effekt == "gull" then
 		partikler(kropp, { Texture = "rbxasset://textures/particles/sparkles_main.dds", Rate = 9,
 			Lifetime = NumberRange.new(0.6, 1.2), Speed = NumberRange.new(0.5, 1.5), SpreadAngle = Vector2.new(180, 180),
@@ -213,7 +218,12 @@ local function registrer(m)
 	}
 	local art = Fugler.ART[m:GetAttribute("Art") or ""]
 	st.spredt = art and art.vinge == "spredt"
-	st.noter = art and art.effekt == "noter"
+	local STIGENDE = {
+		noter = { tegn = { "♪", "♫" }, farge = Color3.fromRGB(255, 230, 120), hvert = 1.2 },
+		spokelse = { tegn = { "Boo!", "boo..." }, farge = Color3.fromRGB(220, 245, 255), hvert = 3 },
+		vampyr = { tegn = { "🦇" }, farge = Color3.fromRGB(255, 255, 255), hvert = 2.5 },
+	}
+	st.tekst = art and STIGENDE[art.effekt or ""]
 	st.svever = art and art.effekt == "spokelse"
 	alle[m] = st
 	if st.erFugl then
@@ -310,12 +320,13 @@ local function fugl(st, naa, servertid)
 				pengeTekst(st, math.floor(inntekt * intervall))
 			end
 		end
-		if st.noter and naa > (st.nesteNote or 0) then
-			st.nesteNote = naa + 1.2 + math.random() * 2
+		if st.tekst and naa > (st.nesteNote or 0) then
+			st.nesteNote = naa + st.tekst.hvert + math.random() * st.tekst.hvert
 			local kamera = workspace.CurrentCamera
 			local rot = m:FindFirstChild("Rot")
 			if rot and (rot.Position - kamera.CFrame.Position).Magnitude < 60 then
-				stigendeTekst(st, math.random() < 0.5 and "♪" or "♫", Color3.fromRGB(255, 230, 120), 0.2)
+				local liste = st.tekst.tegn
+				stigendeTekst(st, liste[math.random(1, #liste)], st.tekst.farge, 0.2)
 			end
 		end
 		if st.hoppStart and naa - st.hoppStart < 0.38 then

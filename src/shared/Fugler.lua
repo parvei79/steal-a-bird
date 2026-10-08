@@ -85,13 +85,13 @@ Fugler.ARTER = {
 	{ id = "PumpkinCrow", navn = "Pumpkin Crow", sj = "Rare", t = 0.6, sesong = "Halloween", sesongVekt = 40,
 		effekt = "gresskar", tekst = "Carved itself. Glows at night." },
 	{ id = "VampireFinch", navn = "Vampire Finch", sj = "Epic", t = 0.6, sesong = "Halloween", sesongVekt = 25,
-		tekst = "Real bird. Really drinks blood. Sleep tight." },
+		effekt = "vampyr", tekst = "Real bird. Really drinks blood. Sleep tight." },
 	{ id = "WitchOwl", navn = "Witch Owl", sj = "Epic", t = 0.9, sesong = "Halloween", sesongVekt = 20,
-		tekst = "Hoo-hoo-hocus pocus." },
+		effekt = "magi", tekst = "Hoo-hoo-hocus pocus." },
 	{ id = "SkeletonRaven", navn = "Skeleton Raven", sj = "Legendary", t = 0.7, sesong = "Halloween", sesongVekt = 12,
-		effekt = "spokelys", tekst = "Nevermore. Ever. More." },
+		vinge = "spredt", effekt = "spokelys", tekst = "Nevermore. Ever. More." },
 	{ id = "GhostDove", navn = "Ghost Dove", sj = "Mythic", t = 0.5, sesong = "Halloween", sesongVekt = 3,
-		effekt = "spokelse", tekst = "Boo-coo. Boo-coo." },
+		vinge = "spredt", effekt = "spokelse", tekst = "Boo-coo. Boo-coo." },
 }
 Fugler.ART = {}
 for i, a in Fugler.ARTER do

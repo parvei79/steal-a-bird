@@ -9,6 +9,7 @@ local ModelInfo = krev("shared/ModelInfo")
 Mock.terrengHoyde = function(x, z)
 	return Kart.toppHoyde(x, z) or -1000
 end
+krev("shared/Config").SESONG = nil -- testen skal ikke avhenge av hvilken måned det er
 MODULER["mock/PlayerModule"] = function()
 	return { GetControls = function()
 		return { GetMoveVector = function()

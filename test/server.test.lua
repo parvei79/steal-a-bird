@@ -9,6 +9,7 @@ local Config = krev("shared/Config")
 Mock.terrengHoyde = function(x, z)
 	return Kart.toppHoyde(x, z) or -1000
 end
+krev("shared/Config").SESONG = nil -- testen skal ikke avhenge av hvilken måned det er
 
 local feil = 0
 local function sjekk(ok, tekst)
