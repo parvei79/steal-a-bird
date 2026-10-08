@@ -141,7 +141,9 @@ Senere kommer **Rebirth**: du starter på nytt og får mer inntekt for alltid.
 
 - **Golden Egg Rain:** gratis gylne egg regner ned på øyene, og man kan snappe dem fra hverandre.
 - **Cosmic Night:** 1 % sjanse for Cosmic Shoebill-egg på båndet.
-- Storm og Meteor Egg kommer senere.
+- **Storm** ✅: vind, regn og lynnedslag (med varselring) som slenger folk; Thunderbirds tjener x3.
+- **Meteor Egg** ✅: et brennende egg styrter ned på en øy etter 12 sekunders varsel (Epic/Legendary/Mythic).
+- **Halloween** ✅ (oktober): Spooky Eggs med fem Halloween-fugler, gresskar og flaggermus.
 
 ## 10. Inntekter (steg 4, etter Roblox sine regler)
 
@@ -156,10 +158,10 @@ Senere kommer **Rebirth**: du starter på nytt og får mer inntekt for alltid.
 |---|---|
 | **0. Grunnmur** ✅ | Verktøy, tester og blokkfugler fra GRAPPLER |
 | **1. MVP** ✅ | Reiret med eggebånd, 8 baser, kjøpe og bære, klekke, penger, stjele, rykke, låse, nybegynnerskjold, lagring, alle spiller-animasjonene, 8 fugler. Venter på test i Studio |
-| **2. Fremgang** | Butikk, trading, samlebok og mutasjoner ✅. Gjenstår: de 23 fuglene som mangler modell |
+| **2. Fremgang** ✅ | Butikk, trading, samlebok, mutasjoner og alle 31 fuglene |
 | **3. Liv** ✅ | Golden Egg Rain, Cosmic Night, globale topplister, veiledning for nye spillere, lyder og musikk |
-| **4. Lansering** | Ikon og bilder ✅, game passes og produkter ✅ (ID-ene må lages). Gjenstår: test med venner, publisering |
-| **5. Oppdateringer** | Rebirth ✅. Senere: nye fugler, sesongegg |
+| **4. Lansering** | Ikon og bilder ✅, game passes og produkter med ikoner ✅, publiseringsguide ✅ (`docs/PUBLISERING.md`). Gjenstår (Pål): test med venner, publisere, lage ID-ene |
+| **5. Oppdateringer** | Rebirth ✅, Storm og Meteor ✅, Halloween-sesongen ✅. Senere: flere fugler, juleegg i desember |
 
 ## 12. Risiko
 

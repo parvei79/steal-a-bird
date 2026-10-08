@@ -9,7 +9,8 @@ fuglene fra de andres baser! Rykk tyvene ned fra himmelen før de stikker av med
 - **Stjel:** hold E på en fugl i en annen base og løp hjem med den. Eieren får alarm og kan rykke deg med kroken.
   Da ragdoller du, blir svimmel, og fuglen flyr hjem igjen.
 - **LOCK-knappen** gir et skjold over basen en stund. Nye spillere har 3 minutter nybegynnerskjold.
-- **31 fugler** i 7 sjeldenheter (Common → Secret), med mutasjoner (Gold, Diamond, Rainbow, Galaxy) og samlebok.
+- **36 fugler** i 7 sjeldenheter (Common → Secret) + 5 Halloween-fugler, med mutasjoner (Gold, Diamond, Rainbow,
+  Galaxy) og samlebok med 3D-bilder.
 - **Butikk** med oppgraderinger, **trading** mellom spillere, og **dans** (Chicken Dance, Wave, Flex, Victory).
 - Kode-animasjoner på figurene: svingepositur i tauet, salto og skru, superhelt-landing, ragdoll, svimmel,
   bærepositur, lysspor og fartsstreker.
@@ -49,6 +50,11 @@ python3 tools/bygg_place.py
 | Kjøp / stjel / selg / lås | E (hold for å stjele) | Trykk på knappen |
 | Butikk, samlebok, trading, dans | F, G, T, B (dans direkte: 1–4) | Knappene til venstre |
 | Fri musepeker (for å klikke) | ALT | – |
+
+## Publisering
+
+Se **`docs/PUBLISERING.md`** — steg for steg: publisere, Game Settings, teste med venner, game passes og
+produkter (ikoner i `assets/robux/`), tekst til spillsiden.
 
 ## Robux (når spillet er publisert)
 
