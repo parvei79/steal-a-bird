@@ -3,8 +3,8 @@
 -- Kjør: python3 tools/test_luau.py test/reimport.test.lua --mock
 local ModelInfo = krev("shared/ModelInfo")
 local Kart = krev("shared/Kart")
-Mock.terrengHoyde = function(x, z)
-	return Kart.toppHoyde(x, z) or -1000
+Mock.terrengHoyde = function(x, z, y)
+	return Kart.toppHoyde(x, z, y) or -1000
 end
 krev("shared/Config").SESONG = nil
 

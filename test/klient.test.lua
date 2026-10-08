@@ -7,8 +7,8 @@ local Kart = krev("shared/Kart")
 local Fugler = krev("shared/Fugler")
 local Config = krev("shared/Config")
 
-Mock.terrengHoyde = function(x, z)
-	return Kart.toppHoyde(x, z) or -1000
+Mock.terrengHoyde = function(x, z, y)
+	return Kart.toppHoyde(x, z, y) or -1000
 end
 krev("shared/Config").SESONG = nil -- testen skal ikke avhenge av hvilken måned det er
 
@@ -182,7 +182,7 @@ Mock.fysiske = function()
 end
 local function bakke()
 	local p = rot.Position
-	local h = Kart.toppHoyde(p.X, p.Z) or -1000
+	local h = Kart.toppHoyde(p.X, p.Z, p.Y) or -1000
 	hum.FloorMaterial = (p.Y - 3 <= h + 0.3) and Enum.Material.Grass or Enum.Material.Air
 end
 figur:PivotTo(CFrame.new(Kart.lokal(i, 0, -20, 3)))

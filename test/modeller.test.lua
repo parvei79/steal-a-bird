@@ -6,8 +6,8 @@ local Kart = krev("shared/Kart")
 local Fugler = krev("shared/Fugler")
 local ModelInfo = krev("shared/ModelInfo")
 
-Mock.terrengHoyde = function(x, z)
-	return Kart.toppHoyde(x, z) or -1000
+Mock.terrengHoyde = function(x, z, y)
+	return Kart.toppHoyde(x, z, y) or -1000
 end
 krev("shared/Config").SESONG = nil -- testen skal ikke avhenge av hvilken måned det er
 MODULER["mock/PlayerModule"] = function()

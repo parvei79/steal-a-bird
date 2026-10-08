@@ -4,8 +4,8 @@ Sving deg mellom svevende øyer med gripekrok, kjøp rare egg, klekk sjeldne fug
 fuglene fra de andres baser! Rykk tyvene ned fra himmelen før de stikker av med din Phoenix.
 
 - **Reiret i midten:** egg ruller rundt på et transportbånd. Kjøp med E og bær egget hjem over hodet.
-- **8 baser** på svevende blokk-øyer. Ingen broer: du må svinge deg over med kroken (trappesteiner hjelper, og
-  når tauet drar deg helt inn mot en øy, blir du kastet opp på kanten). Eggene klekkes på soklene og blir fugler
+- **8 baser** på svevende blokk-øyer. Ingen broer: du må svinge deg over med kroken (trappesteiner og små svevende
+  øyer over basene og over Reiret hjelper, og når tauet drar deg inn mot en øy, blir du kastet opp på kanten). Eggene klekkes på soklene og blir fugler
   som tjener penger hvert sekund. Hent pengene på COLLECT-platen.
 - **Stjel:** hold E på en fugl i en annen base og sving deg hjem med den — jo sjeldnere, jo tyngre å bære. Eieren får alarm og kan rykke deg med kroken.
   Da ragdoller du, blir svimmel, og fuglen flyr hjem igjen.

@@ -33,6 +33,20 @@ for i = 1, Kart.ANTALL_BASER do
 	table.insert(Kart.STEINER, { x = math.cos(a) * 178, z = math.sin(a) * 178, topp = 70 + (i % 2) * 8, r = 7,
 		dybde = 12, fro = 40 + i })
 end
+-- Små svevende øyer høyt oppe: én over hver base (bak soklene, med god takhøyde) og én høyt over Reiret.
+-- De er noe å svinge seg i på vei hjem.
+Kart.HIMMELOYER = {}
+for i = 1, Kart.ANTALL_BASER do
+	local a = (i - 1) / Kart.ANTALL_BASER * 2 * math.pi
+	local r = Kart.BASE_AVSTAND + 12
+	table.insert(Kart.HIMMELOYER, { x = math.cos(a) * r, z = math.sin(a) * r, topp = Kart.HOYDE + 30, r = 7, dybde = 6,
+		fro = 70 + i })
+end
+table.insert(Kart.HIMMELOYER, { x = 0, z = 0, topp = Kart.HOYDE + 44, r = 9, dybde = 8, fro = 80 })
+for _, h in Kart.HIMMELOYER do
+	table.insert(Kart.STEINER, h)
+end
+
 -- Trappesteiner (det er ingen broer): én høy stein midt på linjen mellom hver base og Reiret.
 for i = 1, Kart.ANTALL_BASER do
 	local a = (i - 1) / Kart.ANTALL_BASER * 2 * math.pi
@@ -92,15 +106,16 @@ function Kart.alleOyer()
 	return liste
 end
 
--- Høyeste bakke (toppen av en øy) rett over/under (x, z), eller nil. Broene teller ikke med.
-function Kart.toppHoyde(x, z)
+-- Toppen av bakken ved (x, z), eller nil. Med y: bare øyer man er over eller inni (y >= bunnen av øya), så en
+-- svevende øy over hodet ikke teller. Uten y: den høyeste toppen.
+function Kart.toppHoyde(x, z, y)
 	local B = Kart.BLOKK
 	local cx, cz = (math.floor(x / B) + 0.5) * B, (math.floor(z / B) + 0.5) * B
 	local best = nil
 	for _, oy in Kart.alleOyer() do
 		if math.abs(cx - oy.x) <= oy.r + 3 and math.abs(cz - oy.z) <= oy.r + 3 then
-			local topp = Kart.kolonne(oy, cx, cz)
-			if topp and (not best or topp > best) then
+			local topp, bunn = Kart.kolonne(oy, cx, cz)
+			if topp and (not y or y >= bunn - 0.5) and (not best or topp > best) then
 				best = topp
 			end
 		end

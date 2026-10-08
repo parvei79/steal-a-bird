@@ -1151,7 +1151,7 @@ function metoder.Raycast(_, fra, retning, params)
 			end
 		end
 		if medTerreng then
-			local h = Mock.terrengHoyde(fra.X, fra.Z)
+			local h = Mock.terrengHoyde(fra.X, fra.Z, fra.Y)
 			if not params.IgnoreWater and h < 0 then
 				kandidat({ Position = Vector3.new(fra.X, 0, fra.Z), Normal = Vector3.yAxis, Instance = terreng,
 					Material = Enum.Material.Water, Distance = (fra.Y - 0) / -enhet.Y })
@@ -1178,7 +1178,7 @@ function metoder.Raycast(_, fra, retning, params)
 			end
 		end
 		if medTerreng then
-			local h = Mock.terrengHoyde(p.X, p.Z)
+			local h = Mock.terrengHoyde(p.X, p.Z, p.Y)
 			if p.Y <= h then
 				kandidat({ Position = Vector3.new(p.X, h, p.Z), Normal = Vector3.yAxis, Instance = terreng,
 					Material = Enum.Material.Grass, Distance = t })
@@ -1208,8 +1208,27 @@ function Mock.steg(dt)
 			local pos = del.Position + v * dt
 			-- enkel bakkekollisjon (veien eller terrenget)
 			local bunn = del.Size.Y / 2
-			local bakke = (Mock.veiHoyde and Mock.veiHoyde(pos + Vector3.new(0, bunn + 1, 0))) or Mock.terrengHoyde(pos.X, pos.Z)
-			if pos.Y - bunn < bakke then
+			local bakke = (Mock.veiHoyde and Mock.veiHoyde(pos + Vector3.new(0, bunn + 1, 0))) or Mock.terrengHoyde(pos.X, pos.Z, pos.Y)
+			local gammelPos = del.Position
+			if pos.Y - bunn < bakke and gammelPos.Y - bunn < bakke - 1 and not Mock.veiHoyde then
+				-- kom fra siden eller nedenfra: skli langs øya (som mot en vegg/et tak) i stedet for å løftes opp
+				local function inni(p)
+					return p.Y - bunn < Mock.terrengHoyde(p.X, p.Z, p.Y) - 1
+				end
+				local flytt = Vector3.new(pos.X, gammelPos.Y, pos.Z)
+				local loft = Vector3.new(gammelPos.X, pos.Y, gammelPos.Z)
+				if not inni(flytt) then
+					pos = flytt
+					v = Vector3.new(v.X, 0, v.Z)
+				elseif not inni(loft) then
+					pos = loft
+					v = Vector3.new(0, v.Y, 0)
+				else
+					pos = gammelPos
+					v = Vector3.zero
+				end
+				del.AssemblyLinearVelocity = v
+			elseif pos.Y - bunn < bakke then
 				pos = Vector3.new(pos.X, bakke + bunn, pos.Z)
 				if v.Y < 0 then
 					v = Vector3.new(v.X * 0.98, del.Name == "Granat" and -v.Y * 0.4 or 0, v.Z * 0.98)

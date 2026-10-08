@@ -19,7 +19,8 @@ local spiller = Players.LocalPlayer
 local remotes = ReplicatedStorage:WaitForChild("Remotes")
 local kamera = workspace.CurrentCamera
 local K, KAMP = Config.KROK, Config.KAMP
-local oyVed, kantkast
+local oyVed
+local kast = nil -- pågående kast opp på kanten: { oy, fase = "ut"|"opp", slutt }
 
 local s = Krok.ny()
 local figur, hum, rot
@@ -213,20 +214,23 @@ oyVed = function(p)
 	return nil
 end
 
--- Farten som kaster deg i en bue fra pos opp og inn på toppen av øya (nærmeste kant).
-kantkast = function(oy, pos)
-	local K = Config.KANTKAST
+-- Kast opp på kanten i faser: «ut» (bare når du er under øya: ut forbi kanten), «opp» (rett opp til over
+-- toppen) og «inn» (inn over kanten og ned på toppen, nær kanten du kom fra).
+local function opp(oy, pos)
+	local hoyde = math.max(oy.topp + Config.KANTKAST.OVER - pos.Y, 2)
+	return math.sqrt(2 * workspace.Gravity * hoyde)
+end
+
+local function inn(oy, pos, vy)
+	local g = workspace.Gravity
 	local senter = Vector3.new(oy.x, 0, oy.z)
 	local ut = Vector3.new(pos.X, 0, pos.Z) - senter
 	ut = ut.Magnitude > 0.5 and ut.Unit or Vector3.new(1, 0, 0)
-	local inn = math.max(oy.r - K.INN, oy.r * 0.4)
-	local maal = Vector3.new(oy.x, oy.topp + 3, oy.z) + ut * inn
-	local g = workspace.Gravity
-	local topp = math.max(maal.Y, pos.Y) + K.OVER
-	local vy = math.sqrt(2 * g * (topp - pos.Y))
-	local tid = vy / g + math.sqrt(2 * (topp - maal.Y) / g)
+	local maal = senter + ut * math.max(oy.r - Config.KANTKAST.INN, oy.r * 0.4)
+	local fall = pos.Y - (oy.topp + 3)
+	local tid = (vy + math.sqrt(math.max(vy * vy + 2 * g * fall, 0))) / g
 	local flat = Vector3.new(maal.X - pos.X, 0, maal.Z - pos.Z)
-	return flat / tid + Vector3.new(0, vy, 0)
+	return flat / math.max(tid, 0.25)
 end
 
 local function steg(dt)
@@ -276,11 +280,37 @@ local function steg(dt)
 		end
 	end
 
-	-- kast opp på kanten når du er dratt helt inn mot en øy
+	-- kast opp på kanten når du er dratt helt inn mot en øy (se faser over)
+	if kast then
+		if not res.v or s.bevegelse ~= "flyr" then
+			kast = nil
+		else
+			local p = rot.Position
+			local d = Vector3.new(p.X - kast.oy.x, 0, p.Z - kast.oy.z).Magnitude
+			if kast.fase == "ut" and (d > kast.oy.r + 2 or os.clock() > kast.slutt) then
+				kast.fase = "opp"
+				kast.slutt = os.clock() + 1.5
+				res.v = Vector3.new(0, opp(kast.oy, p), 0)
+			elseif kast.fase == "opp" and (p.Y > kast.oy.topp + 2 or os.clock() > kast.slutt) then
+				res.v = inn(kast.oy, p, res.v.Y) + Vector3.new(0, res.v.Y, 0)
+				kast = nil
+			end
+		end
+	end
 	if res.v and s.krok == "fest" and s.bevegelse == "hekta" and not maalModell and s.anker then
 		local oy = oyVed(s.anker)
 		if oy and rot.Position.Y < oy.topp + 1 and (s.anker - rot.Position).Magnitude < Config.KANTKAST.AVSTAND then
-			local v = kantkast(oy, rot.Position)
+			local flat = Vector3.new(rot.Position.X - oy.x, 0, rot.Position.Z - oy.z)
+			local v
+			if flat.Magnitude < oy.r + 1 then
+				-- under øya: ut forbi kanten først
+				local ut = flat.Magnitude > 0.5 and flat.Unit or Vector3.new(1, 0, 0)
+				v = ut * 40 + Vector3.new(0, 10, 0)
+				kast = { oy = oy, fase = "ut", slutt = os.clock() + 1.2 }
+			else
+				v = Vector3.new(0, opp(oy, rot.Position), 0)
+				kast = { oy = oy, fase = "opp", slutt = os.clock() + 1.5 }
+			end
 			Grappler.slipp()
 			s.slippBoost = false
 			s.settFart = v

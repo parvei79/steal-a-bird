@@ -323,11 +323,8 @@ local function skyer()
 	m.Name = "Skyer"
 	m.Parent = mappe
 	local rng = Random.new(77)
-	for _ = 1, 60 do
-		local a, r = rng:NextNumber(0, math.pi * 2), rng:NextNumber(0, 420)
-		sky(Vector3.new(math.cos(a) * r, rng:NextNumber(-25, -8), math.sin(a) * r), rng:NextNumber(30, 60), rng, m)
-	end
-	for _ = 1, 16 do
+	-- ingen skyer under øyene; bare noen få høyt oppe
+	for _ = 1, 10 do
 		local a, r = rng:NextNumber(0, math.pi * 2), rng:NextNumber(120, 380)
 		sky(Vector3.new(math.cos(a) * r, rng:NextNumber(130, 210), math.sin(a) * r), rng:NextNumber(18, 34), rng, m)
 	end

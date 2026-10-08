@@ -27,7 +27,7 @@ for _, oy in Kart.alleOyer() do
 end
 
 local function paaBakken(pos, tekst, hoyde)
-	local t = Kart.toppHoyde(pos.X, pos.Z)
+	local t = Kart.toppHoyde(pos.X, pos.Z, (hoyde or Kart.HOYDE) + 1)
 	sjekk(t ~= nil and math.abs(t - (hoyde or Kart.HOYDE)) < 0.01, tekst .. string.format(" (%.0f, %.0f) står ikke på bakken", pos.X, pos.Z))
 end
 

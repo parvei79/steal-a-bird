@@ -6,8 +6,8 @@ local Kart = krev("shared/Kart")
 local Fugler = krev("shared/Fugler")
 local Config = krev("shared/Config")
 
-Mock.terrengHoyde = function(x, z)
-	return Kart.toppHoyde(x, z) or -1000
+Mock.terrengHoyde = function(x, z, y)
+	return Kart.toppHoyde(x, z, y) or -1000
 end
 -- et testprodukt (Server Luck) med ID, og Halloween-sesongen, før serveren starter
 Config.ROBUX.PRODUKT[1].produktId = 4242
