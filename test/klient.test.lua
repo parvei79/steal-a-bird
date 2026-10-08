@@ -339,5 +339,20 @@ steg(0.4)
 sjekk(Klientdata.status.rebirths == 1, "rebirth gjennomført via knappene")
 Menyer.lukk()
 
+-- testpanelet (Studio): Meteor-knappen starter meteoren
+local testKnapp = nil
+for _, d in hudSkjerm:GetDescendants() do
+	if d:IsA("TextButton") and d.Text == "☄️ Meteor" then
+		testKnapp = d
+	end
+end
+sjekk(testKnapp ~= nil, "testpanelet finnes i Studio")
+if testKnapp then
+	testKnapp.MouseButton1Click:Fire()
+	steg(0.3)
+	sjekk(workspace:GetAttribute("Hendelse") == "Meteor", "testknappen startet meteoren")
+	krev("server/Hendelser").slutt()
+end
+
 print(string.format("Simulerte %.0f s.", Mock.tid()))
 print((#Mock.feil == 0 and feil == 0) and "INGEN FEIL" or ("FEIL: " .. (#Mock.feil + feil)))

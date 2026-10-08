@@ -98,6 +98,22 @@ hudKnapp("Index", mobil and "📖 INDEX" or "📖 INDEX [G]", F.bla, 2)
 hudKnapp("Trade", mobil and "🤝 TRADE" or "🤝 TRADE [T]", F.gul, 3)
 hudKnapp("Dance", mobil and "💃 DANCE" or "💃 DANCE [B]", F.lilla, 4)
 
+-- Testpanel (bare i Studio): start hendelsene med en gang i stedet for å vente
+if game:GetService("RunService"):IsStudio() then
+	local panel = UI.panel({ AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0),
+		Size = UDim2.fromOffset(170, 330), BackgroundTransparency = 0.25 }, skjerm)
+	UI.tekst({ Position = UDim2.fromOffset(8, 4), Size = UDim2.new(1, -16, 0, 24), Text = "🧪 TEST (Studio)" }, panel)
+	local liste = UI.ny("Frame", { Position = UDim2.fromOffset(8, 32), Size = UDim2.new(1, -16, 1, -40),
+		BackgroundTransparency = 1 }, panel)
+	UI.ny("UIListLayout", { Padding = UDim.new(0, 5) }, liste)
+	for _, k in { { "GoldenRain", "🥚 Golden Rain" }, { "Storm", "⛈️ Storm" }, { "CosmicNight", "🌙 Cosmic Night" },
+		{ "Meteor", "☄️ Meteor" }, { "spooky", "🎃 Spooky Egg" }, { "secret", "✨ Secret Egg" }, { "penger", "💰 +$1M" } } do
+		UI.knapp({ Size = UDim2.new(1, 0, 0, 36), Text = k[2], BackgroundColor3 = F.panel2 }, liste, function()
+			game:GetService("ReplicatedStorage").Remotes.Handling:FireServer("test", k[1])
+		end)
+	end
+end
+
 -- ---------------------------------------------------------------- meldinger og bannere
 local strom = UI.ny("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 122),
 	Size = UDim2.fromOffset(700, 200), BackgroundTransparency = 1 }, skjerm)

@@ -731,6 +731,10 @@ function metoder.GetPlayers()
 	return table.clone(Mock.spillere)
 end
 function metoder.SetCoreGuiEnabled() end
+Mock.studio = true
+function metoder.IsStudio()
+	return Mock.studio
+end
 function metoder.SetCore() end
 Mock.lukking = {}
 function metoder.BindToClose(_, f)

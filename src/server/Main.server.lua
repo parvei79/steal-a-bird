@@ -148,6 +148,25 @@ remotes.Handling.OnServerEvent:Connect(function(spiller, type_, a, b)
 		else
 			figur:SetAttribute("Emote", nil)
 		end
+	elseif type_ == "test" and game:GetService("RunService"):IsStudio() then
+		-- testpanelet (bare i Studio): start hendelser, få penger, legg Spooky/Secret-egg på båndet
+		if a == "penger" then
+			Spillere.giPenger(spiller, 1000000)
+		elseif a == "spooky" or a == "secret" then
+			local Fugl = Fugler
+			local rng = Random.new()
+			if a == "spooky" then
+				local art = Fugl.trekkSesong(rng, "Halloween", Reiret.tillat)
+				if art then
+					Reiret.nyttEgg("Spooky", art)
+				end
+			else
+				Reiret.nyttEgg("Secret", "CosmicShoebill")
+			end
+		elseif Hendelser.NAVN[a] then
+			Hendelser.slutt()
+			Hendelser.start(a)
+		end
 	elseif type_ == "rebirth" then
 		local pris = Spillere.rebirthPris(spiller)
 		local feil
