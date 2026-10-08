@@ -107,9 +107,10 @@ def behold_fra_gammel(sti):
         print('Advarsel: kunne ikke lese', sti, e)
         return [], ''
     funnet = {}
-    for tjeneste in rot.findall('Item'):
-        if tjeneste.get('class') not in ('Workspace', 'ServerStorage'):
-            continue
+    # en ny import ligger i Workspace: den vinner over en gammel i ServerStorage
+    tjenester = sorted((t for t in rot.findall('Item') if t.get('class') in ('Workspace', 'ServerStorage')),
+                       key=lambda t: 0 if t.get('class') == 'Workspace' else 1)
+    for tjeneste in tjenester:
         for it in tjeneste.findall('Item'):
             navn = it.find("Properties/string[@name='Name']")
             if navn is None or navn.text not in BEHOLD or it.get('class') != 'Model':
